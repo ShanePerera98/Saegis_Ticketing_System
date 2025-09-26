@@ -1,0 +1,55 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Laravel specific files
+/public/hot
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+
+# Build files
+/public/build
+/public/mix-manifest.json
+
+# Database
+database/database.sqlite
+
+# Logs
+/storage/logs/*.log
+npm-debug.log
+yarn-error.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+/.idea
+/.vscode
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache directories
+bootstrap/cache/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# User-specific folder that was causing issues
+/UsersAdmin-ITTicketingManagementSystem
