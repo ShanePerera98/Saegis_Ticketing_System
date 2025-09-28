@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('duplicate_merges')) {
+            return;
+        }
+
         Schema::create('duplicate_merges', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_ticket_id')->constrained('tickets')->cascadeOnDelete();

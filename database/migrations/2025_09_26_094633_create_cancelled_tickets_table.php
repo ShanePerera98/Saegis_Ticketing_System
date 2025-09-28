@@ -11,6 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // If the table already exists (from a previous/alternate migration),
+        // skip creation to avoid duplicate table errors when running all
+        // migrations (for example with migrate:fresh in CI or locally).
+        if (Schema::hasTable('cancelled_tickets')) {
+            return;
+        }
+
         Schema::create('cancelled_tickets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->unique()->constrained()->cascadeOnDelete();

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('deleted_tickets_log')) {
+            return;
+        }
+
         Schema::create('deleted_tickets_log', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ticket_id'); // Don't use FK as ticket might be hard deleted

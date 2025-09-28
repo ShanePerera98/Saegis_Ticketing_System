@@ -9,23 +9,19 @@ class ActivityLogger
 {
     public static function log(
         string $action,
-        $entity,
-        ?array $payload = null,
-        ?array $changes = null,
-        ?Request $request = null
-    ): ActivityLog {
-        $request = $request ?? request();
-        
-        return ActivityLog::log(
-            auth()->id(),
-            $action,
-            get_class($entity),
-            $entity->id,
-            $payload,
-            $changes,
-            $request->ip(),
-            $request->userAgent()
-        );
+        $entity = null
+    ): void {
+        $actorId = auth()->check() ? auth()->id() : null;
+        $entityType = $entity ? (is_object($entity) ? get_class($entity) : (string)$entity) : 'unknown';
+        $entityId = null;
+        if (is_object($entity) && property_exists($entity, 'id')) {
+            $entityId = $entity->id ? (int) $entity->id : null;
+        }
+
+        $ip = app()->runningInConsole() ? null : request()->ip();
+        $agent = app()->runningInConsole() ? null : request()->userAgent();
+
+        \App\Models\ActivityLog::log($actorId, $action, $entityType, $entityId, $ip, $agent);
     }
 
     public static function logTicketCreated($ticket, ?Request $request = null): ActivityLog
