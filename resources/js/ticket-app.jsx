@@ -177,6 +177,12 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+
+                {/* Direct tickets path -> role-based redirect so server can point to /tickets */}
+                <Route
+                  path="/tickets"
+                  element={<RoleBasedRedirect />}
+                />
                 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to="/" />} />

@@ -257,7 +257,7 @@ forTicket.head = (args: { ticketId: string | number } | [ticketId: string | numb
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-export const show = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -272,7 +272,7 @@ show.definition = {
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-show.url = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+show.url = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { activityLog: args }
     }
@@ -305,7 +305,7 @@ show.url = (args: { activityLog: string | number | { id: string | number } } | [
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-show.get = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -314,7 +314,7 @@ show.get = (args: { activityLog: string | number | { id: string | number } } | [
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-show.head = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
@@ -324,7 +324,7 @@ show.head = (args: { activityLog: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-    const showForm = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    const showForm = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
         action: show.url(args, options),
         method: 'get',
     })
@@ -334,7 +334,7 @@ show.head = (args: { activityLog: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-        showForm.get = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        showForm.get = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: show.url(args, options),
             method: 'get',
         })
@@ -343,7 +343,7 @@ show.head = (args: { activityLog: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/Api/ActivityLogController.php:51
  * @route '/api/activity-logs/{activityLog}'
  */
-        showForm.head = (args: { activityLog: string | number | { id: string | number } } | [activityLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        showForm.head = (args: { activityLog: number | { id: number } } | [activityLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: show.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'HEAD',
