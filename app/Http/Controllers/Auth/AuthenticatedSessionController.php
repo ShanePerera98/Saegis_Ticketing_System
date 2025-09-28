@@ -45,7 +45,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+    // Redirect to the SPA route which serves the tickets page
+    return redirect()->intended(route('spa', absolute: false));
     }
 
     /**

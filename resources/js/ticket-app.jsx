@@ -200,5 +200,6 @@ const App = () => {
 const container = document.getElementById('ticket-app');
 if (container) {
   const root = createRoot(container);
+  console.log('Ticket-app mounting...');
   root.render(<App />);
 }

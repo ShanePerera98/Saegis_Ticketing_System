@@ -1,0 +1,17 @@
+
+> dev
+> vite --port 5173 --host 0.0.0.0
+
+[2m2:53:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m info: Types generated for actions, routes, form variants
+  Plugin: [35m@laravel/vite-plugin-wayfinder[39m
+
+  [32m[1mVITE[22m v7.1.5[39m  [2mready in [0m[1m4361[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.1.49:[1m5173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+
+  [31m[1mLARAVEL[22m v12.31.1[39m  [2mplugin[22m [1mv2.0.0[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mhttp://localhost[39m
+npm error A complete log of this run can be found in: C:\Users\Anush\AppData\Local\npm-cache\_logs\2025-09-28T09_23_18_777Z-debug-0.log

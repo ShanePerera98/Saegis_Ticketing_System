@@ -19,12 +19,8 @@ const Login = () => {
     try {
       const user = await login({ email, password });
       
-      // Redirect based on role
-      if (user.role === 'CLIENT') {
-        navigate('/client/tickets');
-      } else {
-        navigate('/dashboard');
-      }
+      // Redirect to the SPA tickets entry; SPA will further route based on role
+      navigate('/tickets');
     } catch (error) {
       setError(error.response?.data?.message || 'Login failed');
     } finally {
@@ -48,11 +44,8 @@ const Login = () => {
         setLoading(true);
         const user = await login(creds);
         
-        if (user.role === 'CLIENT') {
-          navigate('/client/tickets');
-        } else {
-          navigate('/dashboard');
-        }
+        // Navigate to /tickets and let the SPA redirect internally
+        navigate('/tickets');
       } catch (error) {
         setError(error.response?.data?.message || 'Login failed');
       } finally {

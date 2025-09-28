@@ -11,7 +11,7 @@ const AdminNavigation = () => {
   }
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/tickets', label: 'Tickets' },
     { path: '/cancelled-tickets', label: 'Cancelled Tickets' },
     { path: '/merge-center', label: 'Merge Center' },
     { path: '/reports', label: 'Reports' },

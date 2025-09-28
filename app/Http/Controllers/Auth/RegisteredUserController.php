@@ -46,6 +46,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+    // Redirect newly registered users to the SPA (tickets)
+    return redirect()->intended(route('spa', absolute: false));
     }
 }

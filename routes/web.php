@@ -8,11 +8,8 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-});
+// Dashboard route removed — SPA handles tickets and role-based redirects.
+// Keep any authenticated routes inside the SPA. The SPA route below serves the ticketing app.
 
 // SPA Routes for Ticketing System
 Route::get('/tickets/{path?}', [SPAController::class, 'index'])

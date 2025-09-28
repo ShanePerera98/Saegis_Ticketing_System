@@ -45,13 +45,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authApi.login(credentials);
       const { token, user: userData, abilities: userAbilities } = response.data;
-      
+
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
-      
+
       setUser(userData);
       setAbilities(userAbilities);
-      
+
       return userData;
     } catch (error) {
       throw error;
