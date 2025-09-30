@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect('/tickets');
 })->name('home');
 
 // Dashboard route removed — SPA handles tickets and role-based redirects.

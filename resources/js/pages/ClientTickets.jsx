@@ -3,329 +3,259 @@ import { useQuery } from '@tanstack/react-query';
 import { ticketApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
-const statusColors = {
-  NEW: 'bg-blue-100 text-blue-800',
-  IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-  ON_HOLD: 'bg-orange-100 text-orange-800',
-  RESOLVED: 'bg-green-100 text-green-800',
-  CLOSED: 'bg-gray-100 text-gray-800',
-};
-
-const priorityColors = {
-  LOW: 'bg-green-100 text-green-800',
-  MEDIUM: 'bg-blue-100 text-blue-800',
-  HIGH: 'bg-orange-100 text-orange-800',
-  URGENT: 'bg-red-100 text-red-800',
-};
-
-const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: 'MEDIUM',
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-    setFormData({ title: '', description: '', priority: 'MEDIUM' });
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 className="text-lg font-medium mb-4">Create New Ticket</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Brief description of the issue"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Priority
-            </label>
-            <select
-              value={formData.priority}
-              onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              required
-              rows={4}
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Please describe the issue in detail..."
-            />
-          </div>
-          
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Create Ticket
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
 const ClientTickets = () => {
   const { user, logout } = useAuth();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    status: '',
+  const [selectedStatus, setSelectedStatus] = useState('New');
+  const [formData, setFormData] = useState({
+    issueType: '',
     priority: '',
+    affectedUsers: '',
+    floor: '',
+    hall: '',
+    description: ''
   });
 
-  const { data: tickets, isLoading, error, refetch } = useQuery({
-    queryKey: ['client-tickets', filters],
-    queryFn: () => ticketApi.list(filters).then(res => res.data),
-    enabled: !!user, // Only run query if user is authenticated
-  });
+  // Status options for sidebar
+  const statusOptions = [
+    'New',
+    'In Progress', 
+    'Pending',
+    'Resolved',
+    'Canceled',
+    'Closed',
+    'Deleted'
+  ];
 
-  const handleCreateTicket = async (formData) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await ticketApi.create(formData);
-      setIsCreateModalOpen(false);
-      refetch();
+      // Convert form data to API format
+      const ticketData = {
+        title: `${formData.issueType} - ${formData.floor}/${formData.hall}`,
+        description: formData.description,
+        priority: formData.priority.toUpperCase(),
+        // Add other fields as needed
+      };
+      
+      await ticketApi.create(ticketData);
+      // Reset form
+      setFormData({
+        issueType: '',
+        priority: '',
+        affectedUsers: '',
+        floor: '',
+        hall: '',
+        description: ''
+      });
+      alert('Ticket created successfully!');
     } catch (error) {
       console.error('Failed to create ticket:', error);
-      // Handle error - could add toast notification
+      alert('Failed to create ticket. Please try again.');
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading your tickets...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-600">Error loading tickets: {error.message}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Support Tickets</h1>
-              <p className="text-gray-600">Welcome back, {user?.name}</p>
+      <header className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center space-x-4">
+            <button className="p-2">
+              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+                <div className="w-full h-0.5 bg-gray-600"></div>
+                <div className="w-full h-0.5 bg-gray-600"></div>
+                <div className="w-full h-0.5 bg-gray-600"></div>
+              </div>
+            </button>
+            <div className="flex items-center space-x-2">
+              <img 
+                src="/logo.svg" 
+                alt="Saegis Logo" 
+                className="w-8 h-8"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+              <span className="text-xl font-semibold text-gray-800">Saegis</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              >
-                New Ticket
-              </button>
-              <button
-                onClick={logout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          {[
-            { label: 'Total Tickets', value: tickets?.data?.length || 0, color: 'blue' },
-            { label: 'Open', value: tickets?.data?.filter(t => ['NEW', 'IN_PROGRESS'].includes(t.status)).length || 0, color: 'yellow' },
-            { label: 'Resolved', value: tickets?.data?.filter(t => t.status === 'RESOLVED').length || 0, color: 'green' },
-            { label: 'Closed', value: tickets?.data?.filter(t => t.status === 'CLOSED').length || 0, color: 'gray' },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white p-6 rounded-lg shadow">
-              <div className="text-sm font-medium text-gray-500">{stat.label}</div>
-              <div className={`text-2xl font-bold text-${stat.color}-600`}>{stat.value}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-lg font-medium mb-4">Filters</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Statuses</option>
-                <option value="NEW">New</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="ON_HOLD">On Hold</option>
-                <option value="RESOLVED">Resolved</option>
-                <option value="CLOSED">Closed</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
-              </label>
-              <select
-                value={filters.priority}
-                onChange={(e) => handleFilterChange('priority', e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Priorities</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Tickets List */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium">
-              Your Tickets ({tickets?.data?.length || 0})
-            </h2>
           </div>
           
-          {tickets?.data?.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No tickets found</p>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              >
-                Create Your First Ticket
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ticket
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Priority
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Assignee
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Last Updated
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {tickets?.data?.map((ticket) => (
-                    <tr key={ticket.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            #{ticket.ticket_number}
-                          </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {ticket.title}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[ticket.status]}`}>
-                          {ticket.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${priorityColors[ticket.priority]}`}>
-                          {ticket.priority}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ticket.current_assignee?.name || 'Unassigned'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(ticket.updated_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900">
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="bg-gray-200 px-6 py-2 rounded-full">
+            <h1 className="text-lg font-medium text-gray-700">Saegis Help Desk</h1>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
+            </button>
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <div className="w-6 h-6 bg-gray-600 rounded"></div>
+            </button>
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <div className="w-6 h-6 bg-gray-600 rounded-full border-2 border-gray-300"></div>
+            </button>
+            <button 
+              onClick={logout}
+              className="p-2 rounded-full hover:bg-gray-100"
+            >
+              <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
+            </button>
+          </div>
         </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-sm min-h-screen">
+          <div className="p-4">
+            <div className="text-sm text-gray-500 mb-2">Client Side</div>
+            <div className="space-y-1">
+              {statusOptions.map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setSelectedStatus(status)}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    selectedStatus === status
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          <div className="max-w-4xl">
+            {/* Create Ticket Header */}
+            <div className="bg-blue-500 text-white text-center py-4 rounded-lg mb-6">
+              <h2 className="text-xl font-semibold flex items-center justify-center">
+                Create Ticket
+                <span className="ml-2 w-6 h-6 bg-white text-blue-500 rounded-full flex items-center justify-center text-lg font-bold">
+                  +
+                </span>
+              </h2>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Issue Type */}
+              <div>
+                <select
+                  name="issueType"
+                  value={formData.issueType}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="">Issue Type</option>
+                  <option value="Technical Support">Technical Support</option>
+                  <option value="Hardware Issue">Hardware Issue</option>
+                  <option value="Software Issue">Software Issue</option>
+                  <option value="Network Issue">Network Issue</option>
+                  <option value="Account Access">Account Access</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                </select>
+              </div>
+
+              {/* Priority */}
+              <div>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="">Priority</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+
+              {/* Affected Users */}
+              <div>
+                <select
+                  name="affectedUsers"
+                  value={formData.affectedUsers}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="">Affected Users</option>
+                  <option value="single">Single User</option>
+                  <option value="multiple">Multiple Users</option>
+                  <option value="department">Entire Department</option>
+                  <option value="company">Company Wide</option>
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <div className="text-gray-700 font-medium mb-2">Location</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    name="floor"
+                    value={formData.floor}
+                    onChange={handleInputChange}
+                    placeholder="Floor"
+                    className="px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    name="hall"
+                    value={formData.hall}
+                    onChange={handleInputChange}
+                    placeholder="Hall"
+                    className="px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <div className="text-gray-700 font-medium mb-2">Description :</div>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
+                  rows="6"
+                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                  placeholder="Please describe the issue in detail..."
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-8 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
       </div>
 
-      {/* Create Ticket Modal */}
-      <CreateTicketModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateTicket}
-      />
+      {/* Question Mark Help Icon */}
+      <div className="fixed bottom-6 right-6">
+        <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-xl font-bold cursor-pointer hover:bg-gray-700">
+          ?
+        </div>
+      </div>
     </div>
   );
 };
