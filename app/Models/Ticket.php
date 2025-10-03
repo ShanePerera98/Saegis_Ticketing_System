@@ -14,12 +14,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ticket extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes; // LogsActivity temporarily removed
 
     protected $fillable = [
         'ticket_number',
         'title',
         'description',
+        'location',
         'status',
         'priority',
         'category_id',

@@ -28,32 +28,6 @@ const Login = () => {
     }
   };
 
-  const quickLogin = async (userType) => {
-    const credentials = {
-      'super-admin': { email: 'super@admin.com', password: 'password' },
-      'admin': { email: 'admin@admin.com', password: 'password' },
-      'client': { email: 'client@example.com', password: 'password' },
-    };
-
-    const creds = credentials[userType];
-    if (creds) {
-      setEmail(creds.email);
-      setPassword(creds.password);
-      
-      try {
-        setLoading(true);
-        const user = await login(creds);
-        
-        // Navigate to /tickets and let the SPA redirect internally
-        navigate('/tickets');
-      } catch (error) {
-        setError(error.response?.data?.message || 'Login failed');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -106,34 +80,6 @@ const Login = () => {
             </button>
           </div>
         </form>
-
-        {/* Quick login buttons for demo */}
-        <div className="mt-8 space-y-2">
-          <p className="text-center text-sm text-gray-600">Quick Login (Demo)</p>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => quickLogin('super-admin')}
-              className="flex-1 py-2 px-4 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
-              disabled={loading}
-            >
-              Super Admin
-            </button>
-            <button
-              onClick={() => quickLogin('admin')}
-              className="flex-1 py-2 px-4 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-              disabled={loading}
-            >
-              Admin
-            </button>
-            <button
-              onClick={() => quickLogin('client')}
-              className="flex-1 py-2 px-4 text-xs bg-green-600 text-white rounded hover:bg-green-700"
-              disabled={loading}
-            >
-              Client
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

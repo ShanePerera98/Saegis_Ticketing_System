@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('cancelled_by')->constrained('users')->onDelete('cascade');
             $table->timestamp('cancelled_at');
             $table->enum('type', CancelledTicketType::values());
-            $table->timestamp('auto_delete_after');
+            $table->timestamp('auto_delete_after')->nullable();
             $table->timestamp('approved_deleted_at')->nullable();
             $table->foreignId('approved_deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();

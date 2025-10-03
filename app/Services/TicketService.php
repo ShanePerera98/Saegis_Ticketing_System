@@ -19,6 +19,7 @@ class TicketService
             $ticket = Ticket::create([
                 'title' => $data['title'],
                 'description' => $data['description'],
+                'location' => $data['location'] ?? null,
                 'priority' => $data['priority'],
                 'category_id' => $data['category_id'] ?? null,
                 'template_id' => $data['template_id'] ?? null,

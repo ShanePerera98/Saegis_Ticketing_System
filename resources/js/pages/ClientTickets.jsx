@@ -2,10 +2,18 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ticketApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import CommonHeader from '../components/CommonHeader';
+import HamburgerMenu from '../components/HamburgerMenu';
+import Sidebar from '../components/Sidebar';
+import Toast from '../components/Toast';
 
 const ClientTickets = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [selectedStatus, setSelectedStatus] = useState('New');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
   const [formData, setFormData] = useState({
     issueType: '',
     priority: '',
@@ -15,20 +23,19 @@ const ClientTickets = () => {
     description: ''
   });
 
-  // Status options for sidebar
-  const statusOptions = [
-    'New',
-    'In Progress', 
-    'Pending',
-    'Resolved',
-    'Canceled',
-    'Closed',
-    'Deleted'
-  ];
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const showToastMessage = (message, type = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
+
+  const hideToast = () => {
+    setShowToast(false);
   };
 
   const handleSubmit = async (e) => {
@@ -36,12 +43,14 @@ const ClientTickets = () => {
     try {
       // Convert form data to API format
       const ticketData = {
-        title: `${formData.issueType} - ${formData.floor}/${formData.hall}`,
+        title: `${formData.issueType}${formData.floor || formData.hall ? ` - ${formData.floor}/${formData.hall}` : ''}`,
         description: formData.description,
         priority: formData.priority.toUpperCase(),
+        location: formData.floor || formData.hall ? `${formData.floor}/${formData.hall}` : null,
         // Add other fields as needed
       };
       
+      console.log('Sending ticket data:', ticketData);
       await ticketApi.create(ticketData);
       // Reset form
       setFormData({
@@ -52,94 +61,64 @@ const ClientTickets = () => {
         hall: '',
         description: ''
       });
-      alert('Ticket created successfully!');
+      showToastMessage('Ticket created successfully!', 'success');
     } catch (error) {
       console.error('Failed to create ticket:', error);
-      alert('Failed to create ticket. Please try again.');
+      if (error.response && error.response.data) {
+        console.error('Validation errors:', error.response.data);
+        const errorMessages = error.response.data.errors 
+          ? Object.values(error.response.data.errors).flat().join(', ')
+          : error.response.data.message || 'Unknown error';
+        showToastMessage(`Failed to create ticket: ${errorMessages}`, 'error');
+      } else {
+        showToastMessage('Failed to create ticket. Please try again.', 'error');
+      }
     }
   };
 
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Mock ticket counts for sidebar
+  const ticketCounts = {
+    'New': 5,
+    'In Progress': 3,
+    'Pending': 1,
+    'Resolved': 12,
+    'Canceled': 0,
+    'Closed': 2,
+    'Deleted': 0
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <button className="p-2">
-              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-                <div className="w-full h-0.5 bg-gray-600"></div>
-                <div className="w-full h-0.5 bg-gray-600"></div>
-                <div className="w-full h-0.5 bg-gray-600"></div>
-              </div>
-            </button>
-            <div className="flex items-center space-x-2">
-              <img 
-                src="/logo.svg" 
-                alt="Saegis Logo" 
-                className="w-8 h-8"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-              <span className="text-xl font-semibold text-gray-800">Saegis</span>
-            </div>
-          </div>
-          
-          <div className="bg-gray-200 px-6 py-2 rounded-full">
-            <h1 className="text-lg font-medium text-gray-700">Saegis Help Desk</h1>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
-            </button>
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <div className="w-6 h-6 bg-gray-600 rounded"></div>
-            </button>
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <div className="w-6 h-6 bg-gray-600 rounded-full border-2 border-gray-300"></div>
-            </button>
-            <button 
-              onClick={logout}
-              className="p-2 rounded-full hover:bg-gray-100"
-            >
-              <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+      {/* Common Header */}
+      <CommonHeader onMenuToggle={toggleMenu} isMenuOpen={isMenuOpen} />
+      
+      {/* Hamburger Menu */}
+      <HamburgerMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-4">
-            <div className="text-sm text-gray-500 mb-2">Client Side</div>
-            <div className="space-y-1">
-              {statusOptions.map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setSelectedStatus(status)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === status
-                      ? 'bg-gray-200 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-          </div>
-        </aside>
+        <Sidebar 
+          selectedStatus={selectedStatus}
+          onStatusChange={handleStatusChange}
+          ticketCounts={ticketCounts}
+        />
 
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-4xl">
             {/* Create Ticket Header */}
-            <div className="bg-blue-500 text-white text-center py-4 rounded-lg mb-6">
+            <div className="bg-blue-500 dark:bg-blue-600 text-white text-center py-4 rounded-lg mb-6 transition-colors">
               <h2 className="text-xl font-semibold flex items-center justify-center">
                 Create Ticket
-                <span className="ml-2 w-6 h-6 bg-white text-blue-500 rounded-full flex items-center justify-center text-lg font-bold">
+                <span className="ml-2 w-6 h-6 bg-white text-blue-500 dark:text-blue-600 rounded-full flex items-center justify-center text-lg font-bold">
                   +
                 </span>
               </h2>
@@ -154,7 +133,7 @@ const ClientTickets = () => {
                   value={formData.issueType}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="">Issue Type</option>
                   <option value="Technical Support">Technical Support</option>
@@ -173,7 +152,7 @@ const ClientTickets = () => {
                   value={formData.priority}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="">Priority</option>
                   <option value="low">Low</option>
@@ -189,7 +168,7 @@ const ClientTickets = () => {
                   name="affectedUsers"
                   value={formData.affectedUsers}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="">Affected Users</option>
                   <option value="single">Single User</option>
@@ -201,7 +180,7 @@ const ClientTickets = () => {
 
               {/* Location */}
               <div>
-                <div className="text-gray-700 font-medium mb-2">Location</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium mb-2 transition-colors">Location</div>
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
@@ -209,7 +188,7 @@ const ClientTickets = () => {
                     value={formData.floor}
                     onChange={handleInputChange}
                     placeholder="Floor"
-                    className="px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                   />
                   <input
                     type="text"
@@ -217,21 +196,21 @@ const ClientTickets = () => {
                     value={formData.hall}
                     onChange={handleInputChange}
                     placeholder="Hall"
-                    className="px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <div className="text-gray-700 font-medium mb-2">Description :</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium mb-2 transition-colors">Description :</div>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   required
                   rows="6"
-                  className="w-full px-4 py-3 bg-gray-200 border-0 rounded-lg text-gray-700 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition-colors"
                   placeholder="Please describe the issue in detail..."
                 />
               </div>
@@ -240,7 +219,7 @@ const ClientTickets = () => {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="px-8 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  className="px-8 py-3 bg-blue-500 dark:bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
                 >
                   Submit
                 </button>
@@ -252,10 +231,19 @@ const ClientTickets = () => {
 
       {/* Question Mark Help Icon */}
       <div className="fixed bottom-6 right-6">
-        <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-xl font-bold cursor-pointer hover:bg-gray-700">
+        <div className="w-12 h-12 bg-gray-800 dark:bg-gray-700 text-white rounded-full flex items-center justify-center text-xl font-bold cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
           ?
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={hideToast}
+        duration={4000}
+      />
     </div>
   );
 };
