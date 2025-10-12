@@ -81,4 +81,13 @@ export const ticketApi = {
   getCategories: () => api.get('/categories'),
 };
 
+export const userApi = {
+  list: (params = {}) => api.get('/users', { params }),
+  get: (id) => api.get(`/users/${id}`),
+  create: (data) => api.post('/users', data),
+  update: (id, data) => api.patch(`/users/${id}`, data),
+  delete: (id) => api.delete(`/users/${id}`),
+  updateStatus: (id, is_active) => api.patch(`/users/${id}/status`, { is_active }),
+};
+
 export default api;

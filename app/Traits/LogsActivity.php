@@ -3,34 +3,49 @@
 namespace App\Traits;
 
 use App\Services\ActivityLogger;
+use Exception;
 
 trait LogsActivity
 {
     public static function bootLogsActivity()
     {
         static::created(function ($model) {
-            ActivityLogger::log(
-                strtolower(class_basename($model)) . '.created',
-                $model
-            );
+            try {
+                ActivityLogger::log(
+                    strtolower(class_basename($model)) . '.created',
+                    $model
+                );
+            } catch (Exception $e) {
+                // Log the error but don't stop execution
+                \Log::error('ActivityLogger error: ' . $e->getMessage());
+            }
         });
 
         static::updated(function ($model) {
             if ($model->wasChanged()) {
-                ActivityLogger::log(
-                    strtolower(class_basename($model)) . '.updated',
-                    $model,
-                    null,
-                    $model->getChanges()
-                );
+                try {
+                    ActivityLogger::log(
+                        strtolower(class_basename($model)) . '.updated',
+                        $model,
+                        ['changes' => $model->getChanges()]
+                    );
+                } catch (Exception $e) {
+                    // Log the error but don't stop execution
+                    \Log::error('ActivityLogger error: ' . $e->getMessage());
+                }
             }
         });
 
         static::deleted(function ($model) {
-            ActivityLogger::log(
-                strtolower(class_basename($model)) . '.deleted',
-                $model
-            );
+            try {
+                ActivityLogger::log(
+                    strtolower(class_basename($model)) . '.deleted',
+                    $model
+                );
+            } catch (Exception $e) {
+                // Log the error but don't stop execution
+                \Log::error('ActivityLogger error: ' . $e->getMessage());
+            }
         });
     }
 

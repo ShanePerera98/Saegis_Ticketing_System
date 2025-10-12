@@ -134,7 +134,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     store.form = storeForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
 export const cancelled = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -149,7 +149,7 @@ cancelled.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
 cancelled.url = (options?: RouteQueryOptions) => {
@@ -158,7 +158,7 @@ cancelled.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
 cancelled.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -167,7 +167,7 @@ cancelled.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
 cancelled.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -177,7 +177,7 @@ cancelled.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
     const cancelledForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -187,7 +187,7 @@ cancelled.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
         cancelledForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -196,7 +196,7 @@ cancelled.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::cancelled
- * @see app/Http/Controllers/Api/TicketController.php:253
+ * @see app/Http/Controllers/Api/TicketController.php:259
  * @route '/api/tickets/cancelled'
  */
         cancelledForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -212,7 +212,7 @@ cancelled.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     cancelled.form = cancelledForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::approveCancellation
- * @see app/Http/Controllers/Api/TicketController.php:273
+ * @see app/Http/Controllers/Api/TicketController.php:279
  * @route '/api/tickets/cancelled/{id}/approve'
  */
 export const approveCancellation = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -227,7 +227,7 @@ approveCancellation.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::approveCancellation
- * @see app/Http/Controllers/Api/TicketController.php:273
+ * @see app/Http/Controllers/Api/TicketController.php:279
  * @route '/api/tickets/cancelled/{id}/approve'
  */
 approveCancellation.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -255,7 +255,7 @@ approveCancellation.url = (args: { id: string | number } | [id: string | number 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::approveCancellation
- * @see app/Http/Controllers/Api/TicketController.php:273
+ * @see app/Http/Controllers/Api/TicketController.php:279
  * @route '/api/tickets/cancelled/{id}/approve'
  */
 approveCancellation.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -265,7 +265,7 @@ approveCancellation.post = (args: { id: string | number } | [id: string | number
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::approveCancellation
- * @see app/Http/Controllers/Api/TicketController.php:273
+ * @see app/Http/Controllers/Api/TicketController.php:279
  * @route '/api/tickets/cancelled/{id}/approve'
  */
     const approveCancellationForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -275,7 +275,7 @@ approveCancellation.post = (args: { id: string | number } | [id: string | number
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::approveCancellation
- * @see app/Http/Controllers/Api/TicketController.php:273
+ * @see app/Http/Controllers/Api/TicketController.php:279
  * @route '/api/tickets/cancelled/{id}/approve'
  */
         approveCancellationForm.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -286,7 +286,7 @@ approveCancellation.post = (args: { id: string | number } | [id: string | number
     approveCancellation.form = approveCancellationForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::restoreTicket
- * @see app/Http/Controllers/Api/TicketController.php:282
+ * @see app/Http/Controllers/Api/TicketController.php:288
  * @route '/api/tickets/cancelled/{id}/restore'
  */
 export const restoreTicket = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -301,7 +301,7 @@ restoreTicket.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::restoreTicket
- * @see app/Http/Controllers/Api/TicketController.php:282
+ * @see app/Http/Controllers/Api/TicketController.php:288
  * @route '/api/tickets/cancelled/{id}/restore'
  */
 restoreTicket.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -329,7 +329,7 @@ restoreTicket.url = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::restoreTicket
- * @see app/Http/Controllers/Api/TicketController.php:282
+ * @see app/Http/Controllers/Api/TicketController.php:288
  * @route '/api/tickets/cancelled/{id}/restore'
  */
 restoreTicket.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -339,7 +339,7 @@ restoreTicket.post = (args: { id: string | number } | [id: string | number ] | s
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::restoreTicket
- * @see app/Http/Controllers/Api/TicketController.php:282
+ * @see app/Http/Controllers/Api/TicketController.php:288
  * @route '/api/tickets/cancelled/{id}/restore'
  */
     const restoreTicketForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -349,7 +349,7 @@ restoreTicket.post = (args: { id: string | number } | [id: string | number ] | s
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::restoreTicket
- * @see app/Http/Controllers/Api/TicketController.php:282
+ * @see app/Http/Controllers/Api/TicketController.php:288
  * @route '/api/tickets/cancelled/{id}/restore'
  */
         restoreTicketForm.post = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -360,7 +360,7 @@ restoreTicket.post = (args: { id: string | number } | [id: string | number ] | s
     restoreTicket.form = restoreTicketForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
 export const merges = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -375,7 +375,7 @@ merges.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
 merges.url = (options?: RouteQueryOptions) => {
@@ -384,7 +384,7 @@ merges.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
 merges.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -393,7 +393,7 @@ merges.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
 merges.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -403,7 +403,7 @@ merges.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
     const mergesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -413,7 +413,7 @@ merges.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
         mergesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -422,7 +422,7 @@ merges.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::merges
- * @see app/Http/Controllers/Api/TicketController.php:291
+ * @see app/Http/Controllers/Api/TicketController.php:297
  * @route '/api/tickets/merges'
  */
         mergesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -438,7 +438,7 @@ merges.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     merges.form = mergesForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
 export const reports = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -453,7 +453,7 @@ reports.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
 reports.url = (options?: RouteQueryOptions) => {
@@ -462,7 +462,7 @@ reports.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
 reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -471,7 +471,7 @@ reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
 reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -481,7 +481,7 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
     const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -491,7 +491,7 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
         reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -500,7 +500,7 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::reports
- * @see app/Http/Controllers/Api/TicketController.php:306
+ * @see app/Http/Controllers/Api/TicketController.php:312
  * @route '/api/tickets/reports'
  */
         reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -516,7 +516,7 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     reports.form = reportsForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
 export const stats = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -531,7 +531,7 @@ stats.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
 stats.url = (options?: RouteQueryOptions) => {
@@ -540,7 +540,7 @@ stats.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
 stats.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -549,7 +549,7 @@ stats.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
 stats.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -559,7 +559,7 @@ stats.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
     const statsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -569,7 +569,7 @@ stats.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
         statsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -578,7 +578,7 @@ stats.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::stats
- * @see app/Http/Controllers/Api/TicketController.php:325
+ * @see app/Http/Controllers/Api/TicketController.php:331
  * @route '/api/tickets/stats'
  */
         statsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -594,7 +594,7 @@ stats.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     stats.form = statsForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
 export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -609,7 +609,7 @@ exportMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
 exportMethod.url = (options?: RouteQueryOptions) => {
@@ -618,7 +618,7 @@ exportMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
 exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -627,7 +627,7 @@ exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
 exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -637,7 +637,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
     const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -647,7 +647,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
         exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -656,7 +656,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::exportMethod
- * @see app/Http/Controllers/Api/TicketController.php:358
+ * @see app/Http/Controllers/Api/TicketController.php:364
  * @route '/api/tickets/export'
  */
         exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -672,7 +672,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     exportMethod.form = exportMethodForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::merge
- * @see app/Http/Controllers/Api/TicketController.php:186
+ * @see app/Http/Controllers/Api/TicketController.php:192
  * @route '/api/tickets/merge'
  */
 export const merge = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -687,7 +687,7 @@ merge.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::merge
- * @see app/Http/Controllers/Api/TicketController.php:186
+ * @see app/Http/Controllers/Api/TicketController.php:192
  * @route '/api/tickets/merge'
  */
 merge.url = (options?: RouteQueryOptions) => {
@@ -696,7 +696,7 @@ merge.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::merge
- * @see app/Http/Controllers/Api/TicketController.php:186
+ * @see app/Http/Controllers/Api/TicketController.php:192
  * @route '/api/tickets/merge'
  */
 merge.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -706,7 +706,7 @@ merge.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::merge
- * @see app/Http/Controllers/Api/TicketController.php:186
+ * @see app/Http/Controllers/Api/TicketController.php:192
  * @route '/api/tickets/merge'
  */
     const mergeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -716,7 +716,7 @@ merge.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::merge
- * @see app/Http/Controllers/Api/TicketController.php:186
+ * @see app/Http/Controllers/Api/TicketController.php:192
  * @route '/api/tickets/merge'
  */
         mergeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -727,7 +727,7 @@ merge.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     merge.form = mergeForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::undoMerge
- * @see app/Http/Controllers/Api/TicketController.php:211
+ * @see app/Http/Controllers/Api/TicketController.php:217
  * @route '/api/tickets/merge/{mergeId}/undo'
  */
 export const undoMerge = (args: { mergeId: string | number } | [mergeId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -742,7 +742,7 @@ undoMerge.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::undoMerge
- * @see app/Http/Controllers/Api/TicketController.php:211
+ * @see app/Http/Controllers/Api/TicketController.php:217
  * @route '/api/tickets/merge/{mergeId}/undo'
  */
 undoMerge.url = (args: { mergeId: string | number } | [mergeId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -770,7 +770,7 @@ undoMerge.url = (args: { mergeId: string | number } | [mergeId: string | number 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::undoMerge
- * @see app/Http/Controllers/Api/TicketController.php:211
+ * @see app/Http/Controllers/Api/TicketController.php:217
  * @route '/api/tickets/merge/{mergeId}/undo'
  */
 undoMerge.post = (args: { mergeId: string | number } | [mergeId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -780,7 +780,7 @@ undoMerge.post = (args: { mergeId: string | number } | [mergeId: string | number
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::undoMerge
- * @see app/Http/Controllers/Api/TicketController.php:211
+ * @see app/Http/Controllers/Api/TicketController.php:217
  * @route '/api/tickets/merge/{mergeId}/undo'
  */
     const undoMergeForm = (args: { mergeId: string | number } | [mergeId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -790,7 +790,7 @@ undoMerge.post = (args: { mergeId: string | number } | [mergeId: string | number
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::undoMerge
- * @see app/Http/Controllers/Api/TicketController.php:211
+ * @see app/Http/Controllers/Api/TicketController.php:217
  * @route '/api/tickets/merge/{mergeId}/undo'
  */
         undoMergeForm.post = (args: { mergeId: string | number } | [mergeId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -801,7 +801,7 @@ undoMerge.post = (args: { mergeId: string | number } | [mergeId: string | number
     undoMerge.form = undoMergeForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
 export const show = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -816,7 +816,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
 show.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -849,7 +849,7 @@ show.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
 show.get = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -858,7 +858,7 @@ show.get = (args: { ticket: number | { id: number } } | [ticket: number | { id: 
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
 show.head = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -868,7 +868,7 @@ show.head = (args: { ticket: number | { id: number } } | [ticket: number | { id:
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
     const showForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -878,7 +878,7 @@ show.head = (args: { ticket: number | { id: number } } | [ticket: number | { id:
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
         showForm.get = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -887,7 +887,7 @@ show.head = (args: { ticket: number | { id: number } } | [ticket: number | { id:
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::show
- * @see app/Http/Controllers/Api/TicketController.php:75
+ * @see app/Http/Controllers/Api/TicketController.php:81
  * @route '/api/tickets/{ticket}'
  */
         showForm.head = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -903,7 +903,7 @@ show.head = (args: { ticket: number | { id: number } } | [ticket: number | { id:
     show.form = showForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::update
- * @see app/Http/Controllers/Api/TicketController.php:96
+ * @see app/Http/Controllers/Api/TicketController.php:102
  * @route '/api/tickets/{ticket}'
  */
 export const update = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -918,7 +918,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::update
- * @see app/Http/Controllers/Api/TicketController.php:96
+ * @see app/Http/Controllers/Api/TicketController.php:102
  * @route '/api/tickets/{ticket}'
  */
 update.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -951,7 +951,7 @@ update.url = (args: { ticket: number | { id: number } } | [ticket: number | { id
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::update
- * @see app/Http/Controllers/Api/TicketController.php:96
+ * @see app/Http/Controllers/Api/TicketController.php:102
  * @route '/api/tickets/{ticket}'
  */
 update.patch = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -961,7 +961,7 @@ update.patch = (args: { ticket: number | { id: number } } | [ticket: number | { 
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::update
- * @see app/Http/Controllers/Api/TicketController.php:96
+ * @see app/Http/Controllers/Api/TicketController.php:102
  * @route '/api/tickets/{ticket}'
  */
     const updateForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -976,7 +976,7 @@ update.patch = (args: { ticket: number | { id: number } } | [ticket: number | { 
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::update
- * @see app/Http/Controllers/Api/TicketController.php:96
+ * @see app/Http/Controllers/Api/TicketController.php:102
  * @route '/api/tickets/{ticket}'
  */
         updateForm.patch = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -992,7 +992,7 @@ update.patch = (args: { ticket: number | { id: number } } | [ticket: number | { 
     update.form = updateForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::assignSelf
- * @see app/Http/Controllers/Api/TicketController.php:112
+ * @see app/Http/Controllers/Api/TicketController.php:118
  * @route '/api/tickets/{ticket}/assign/self'
  */
 export const assignSelf = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1007,7 +1007,7 @@ assignSelf.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::assignSelf
- * @see app/Http/Controllers/Api/TicketController.php:112
+ * @see app/Http/Controllers/Api/TicketController.php:118
  * @route '/api/tickets/{ticket}/assign/self'
  */
 assignSelf.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1040,7 +1040,7 @@ assignSelf.url = (args: { ticket: number | { id: number } } | [ticket: number | 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::assignSelf
- * @see app/Http/Controllers/Api/TicketController.php:112
+ * @see app/Http/Controllers/Api/TicketController.php:118
  * @route '/api/tickets/{ticket}/assign/self'
  */
 assignSelf.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1050,7 +1050,7 @@ assignSelf.post = (args: { ticket: number | { id: number } } | [ticket: number |
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::assignSelf
- * @see app/Http/Controllers/Api/TicketController.php:112
+ * @see app/Http/Controllers/Api/TicketController.php:118
  * @route '/api/tickets/{ticket}/assign/self'
  */
     const assignSelfForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1060,7 +1060,7 @@ assignSelf.post = (args: { ticket: number | { id: number } } | [ticket: number |
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::assignSelf
- * @see app/Http/Controllers/Api/TicketController.php:112
+ * @see app/Http/Controllers/Api/TicketController.php:118
  * @route '/api/tickets/{ticket}/assign/self'
  */
         assignSelfForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1071,7 +1071,7 @@ assignSelf.post = (args: { ticket: number | { id: number } } | [ticket: number |
     assignSelf.form = assignSelfForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::assign
- * @see app/Http/Controllers/Api/TicketController.php:121
+ * @see app/Http/Controllers/Api/TicketController.php:127
  * @route '/api/tickets/{ticket}/assign'
  */
 export const assign = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1086,7 +1086,7 @@ assign.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::assign
- * @see app/Http/Controllers/Api/TicketController.php:121
+ * @see app/Http/Controllers/Api/TicketController.php:127
  * @route '/api/tickets/{ticket}/assign'
  */
 assign.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1119,7 +1119,7 @@ assign.url = (args: { ticket: number | { id: number } } | [ticket: number | { id
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::assign
- * @see app/Http/Controllers/Api/TicketController.php:121
+ * @see app/Http/Controllers/Api/TicketController.php:127
  * @route '/api/tickets/{ticket}/assign'
  */
 assign.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1129,7 +1129,7 @@ assign.post = (args: { ticket: number | { id: number } } | [ticket: number | { i
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::assign
- * @see app/Http/Controllers/Api/TicketController.php:121
+ * @see app/Http/Controllers/Api/TicketController.php:127
  * @route '/api/tickets/{ticket}/assign'
  */
     const assignForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1139,7 +1139,7 @@ assign.post = (args: { ticket: number | { id: number } } | [ticket: number | { i
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::assign
- * @see app/Http/Controllers/Api/TicketController.php:121
+ * @see app/Http/Controllers/Api/TicketController.php:127
  * @route '/api/tickets/{ticket}/assign'
  */
         assignForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1150,7 +1150,7 @@ assign.post = (args: { ticket: number | { id: number } } | [ticket: number | { i
     assign.form = assignForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::addCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:135
+ * @see app/Http/Controllers/Api/TicketController.php:141
  * @route '/api/tickets/{ticket}/collaborators'
  */
 export const addCollaborator = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1165,7 +1165,7 @@ addCollaborator.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::addCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:135
+ * @see app/Http/Controllers/Api/TicketController.php:141
  * @route '/api/tickets/{ticket}/collaborators'
  */
 addCollaborator.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1198,7 +1198,7 @@ addCollaborator.url = (args: { ticket: number | { id: number } } | [ticket: numb
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::addCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:135
+ * @see app/Http/Controllers/Api/TicketController.php:141
  * @route '/api/tickets/{ticket}/collaborators'
  */
 addCollaborator.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1208,7 +1208,7 @@ addCollaborator.post = (args: { ticket: number | { id: number } } | [ticket: num
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::addCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:135
+ * @see app/Http/Controllers/Api/TicketController.php:141
  * @route '/api/tickets/{ticket}/collaborators'
  */
     const addCollaboratorForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1218,7 +1218,7 @@ addCollaborator.post = (args: { ticket: number | { id: number } } | [ticket: num
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::addCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:135
+ * @see app/Http/Controllers/Api/TicketController.php:141
  * @route '/api/tickets/{ticket}/collaborators'
  */
         addCollaboratorForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1229,7 +1229,7 @@ addCollaborator.post = (args: { ticket: number | { id: number } } | [ticket: num
     addCollaborator.form = addCollaboratorForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::removeCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:149
+ * @see app/Http/Controllers/Api/TicketController.php:155
  * @route '/api/tickets/{ticket}/collaborators/{user}'
  */
 export const removeCollaborator = (args: { ticket: number | { id: number }, user: number | { id: number } } | [ticket: number | { id: number }, user: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -1244,7 +1244,7 @@ removeCollaborator.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::removeCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:149
+ * @see app/Http/Controllers/Api/TicketController.php:155
  * @route '/api/tickets/{ticket}/collaborators/{user}'
  */
 removeCollaborator.url = (args: { ticket: number | { id: number }, user: number | { id: number } } | [ticket: number | { id: number }, user: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -1274,7 +1274,7 @@ removeCollaborator.url = (args: { ticket: number | { id: number }, user: number 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::removeCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:149
+ * @see app/Http/Controllers/Api/TicketController.php:155
  * @route '/api/tickets/{ticket}/collaborators/{user}'
  */
 removeCollaborator.delete = (args: { ticket: number | { id: number }, user: number | { id: number } } | [ticket: number | { id: number }, user: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -1284,7 +1284,7 @@ removeCollaborator.delete = (args: { ticket: number | { id: number }, user: numb
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::removeCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:149
+ * @see app/Http/Controllers/Api/TicketController.php:155
  * @route '/api/tickets/{ticket}/collaborators/{user}'
  */
     const removeCollaboratorForm = (args: { ticket: number | { id: number }, user: number | { id: number } } | [ticket: number | { id: number }, user: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1299,7 +1299,7 @@ removeCollaborator.delete = (args: { ticket: number | { id: number }, user: numb
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::removeCollaborator
- * @see app/Http/Controllers/Api/TicketController.php:149
+ * @see app/Http/Controllers/Api/TicketController.php:155
  * @route '/api/tickets/{ticket}/collaborators/{user}'
  */
         removeCollaboratorForm.delete = (args: { ticket: number | { id: number }, user: number | { id: number } } | [ticket: number | { id: number }, user: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1315,7 +1315,7 @@ removeCollaborator.delete = (args: { ticket: number | { id: number }, user: numb
     removeCollaborator.form = removeCollaboratorForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::updateStatus
- * @see app/Http/Controllers/Api/TicketController.php:158
+ * @see app/Http/Controllers/Api/TicketController.php:164
  * @route '/api/tickets/{ticket}/status'
  */
 export const updateStatus = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1330,7 +1330,7 @@ updateStatus.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::updateStatus
- * @see app/Http/Controllers/Api/TicketController.php:158
+ * @see app/Http/Controllers/Api/TicketController.php:164
  * @route '/api/tickets/{ticket}/status'
  */
 updateStatus.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1363,7 +1363,7 @@ updateStatus.url = (args: { ticket: number | { id: number } } | [ticket: number 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::updateStatus
- * @see app/Http/Controllers/Api/TicketController.php:158
+ * @see app/Http/Controllers/Api/TicketController.php:164
  * @route '/api/tickets/{ticket}/status'
  */
 updateStatus.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1373,7 +1373,7 @@ updateStatus.post = (args: { ticket: number | { id: number } } | [ticket: number
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::updateStatus
- * @see app/Http/Controllers/Api/TicketController.php:158
+ * @see app/Http/Controllers/Api/TicketController.php:164
  * @route '/api/tickets/{ticket}/status'
  */
     const updateStatusForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1383,7 +1383,7 @@ updateStatus.post = (args: { ticket: number | { id: number } } | [ticket: number
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::updateStatus
- * @see app/Http/Controllers/Api/TicketController.php:158
+ * @see app/Http/Controllers/Api/TicketController.php:164
  * @route '/api/tickets/{ticket}/status'
  */
         updateStatusForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1394,7 +1394,7 @@ updateStatus.post = (args: { ticket: number | { id: number } } | [ticket: number
     updateStatus.form = updateStatusForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::addComment
- * @see app/Http/Controllers/Api/TicketController.php:233
+ * @see app/Http/Controllers/Api/TicketController.php:239
  * @route '/api/tickets/{ticket}/comments'
  */
 export const addComment = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1409,7 +1409,7 @@ addComment.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::addComment
- * @see app/Http/Controllers/Api/TicketController.php:233
+ * @see app/Http/Controllers/Api/TicketController.php:239
  * @route '/api/tickets/{ticket}/comments'
  */
 addComment.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1442,7 +1442,7 @@ addComment.url = (args: { ticket: number | { id: number } } | [ticket: number | 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::addComment
- * @see app/Http/Controllers/Api/TicketController.php:233
+ * @see app/Http/Controllers/Api/TicketController.php:239
  * @route '/api/tickets/{ticket}/comments'
  */
 addComment.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1452,7 +1452,7 @@ addComment.post = (args: { ticket: number | { id: number } } | [ticket: number |
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::addComment
- * @see app/Http/Controllers/Api/TicketController.php:233
+ * @see app/Http/Controllers/Api/TicketController.php:239
  * @route '/api/tickets/{ticket}/comments'
  */
     const addCommentForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1462,7 +1462,7 @@ addComment.post = (args: { ticket: number | { id: number } } | [ticket: number |
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::addComment
- * @see app/Http/Controllers/Api/TicketController.php:233
+ * @see app/Http/Controllers/Api/TicketController.php:239
  * @route '/api/tickets/{ticket}/comments'
  */
         addCommentForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1473,7 +1473,7 @@ addComment.post = (args: { ticket: number | { id: number } } | [ticket: number |
     addComment.form = addCommentForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelIrrelevant
- * @see app/Http/Controllers/Api/TicketController.php:173
+ * @see app/Http/Controllers/Api/TicketController.php:179
  * @route '/api/tickets/{ticket}/cancel/irrelevant'
  */
 export const cancelIrrelevant = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1488,7 +1488,7 @@ cancelIrrelevant.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelIrrelevant
- * @see app/Http/Controllers/Api/TicketController.php:173
+ * @see app/Http/Controllers/Api/TicketController.php:179
  * @route '/api/tickets/{ticket}/cancel/irrelevant'
  */
 cancelIrrelevant.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1521,7 +1521,7 @@ cancelIrrelevant.url = (args: { ticket: number | { id: number } } | [ticket: num
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::cancelIrrelevant
- * @see app/Http/Controllers/Api/TicketController.php:173
+ * @see app/Http/Controllers/Api/TicketController.php:179
  * @route '/api/tickets/{ticket}/cancel/irrelevant'
  */
 cancelIrrelevant.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1531,7 +1531,7 @@ cancelIrrelevant.post = (args: { ticket: number | { id: number } } | [ticket: nu
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::cancelIrrelevant
- * @see app/Http/Controllers/Api/TicketController.php:173
+ * @see app/Http/Controllers/Api/TicketController.php:179
  * @route '/api/tickets/{ticket}/cancel/irrelevant'
  */
     const cancelIrrelevantForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1541,7 +1541,7 @@ cancelIrrelevant.post = (args: { ticket: number | { id: number } } | [ticket: nu
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::cancelIrrelevant
- * @see app/Http/Controllers/Api/TicketController.php:173
+ * @see app/Http/Controllers/Api/TicketController.php:179
  * @route '/api/tickets/{ticket}/cancel/irrelevant'
  */
         cancelIrrelevantForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1552,7 +1552,7 @@ cancelIrrelevant.post = (args: { ticket: number | { id: number } } | [ticket: nu
     cancelIrrelevant.form = cancelIrrelevantForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::clientDelete
- * @see app/Http/Controllers/Api/TicketController.php:220
+ * @see app/Http/Controllers/Api/TicketController.php:226
  * @route '/api/tickets/{ticket}/client-delete'
  */
 export const clientDelete = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1567,7 +1567,7 @@ clientDelete.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::clientDelete
- * @see app/Http/Controllers/Api/TicketController.php:220
+ * @see app/Http/Controllers/Api/TicketController.php:226
  * @route '/api/tickets/{ticket}/client-delete'
  */
 clientDelete.url = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1600,7 +1600,7 @@ clientDelete.url = (args: { ticket: number | { id: number } } | [ticket: number 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::clientDelete
- * @see app/Http/Controllers/Api/TicketController.php:220
+ * @see app/Http/Controllers/Api/TicketController.php:226
  * @route '/api/tickets/{ticket}/client-delete'
  */
 clientDelete.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1610,7 +1610,7 @@ clientDelete.post = (args: { ticket: number | { id: number } } | [ticket: number
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::clientDelete
- * @see app/Http/Controllers/Api/TicketController.php:220
+ * @see app/Http/Controllers/Api/TicketController.php:226
  * @route '/api/tickets/{ticket}/client-delete'
  */
     const clientDeleteForm = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1620,7 +1620,7 @@ clientDelete.post = (args: { ticket: number | { id: number } } | [ticket: number
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::clientDelete
- * @see app/Http/Controllers/Api/TicketController.php:220
+ * @see app/Http/Controllers/Api/TicketController.php:226
  * @route '/api/tickets/{ticket}/client-delete'
  */
         clientDeleteForm.post = (args: { ticket: number | { id: number } } | [ticket: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

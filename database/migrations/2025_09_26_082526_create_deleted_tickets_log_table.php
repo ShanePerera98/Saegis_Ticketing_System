@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ticket_id'); // Not foreign key since ticket might be deleted
             $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
-            $table->timestamp('deleted_at');
+            $table->timestamp('deleted_at')->nullable();
             $table->text('reason')->nullable();
             $table->timestamps();
 

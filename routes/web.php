@@ -5,16 +5,22 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect('/tickets');
 })->name('home');
 
-// Dashboard route removed — SPA handles tickets and role-based redirects.
-// Keep any authenticated routes inside the SPA. The SPA route below serves the ticketing app.
+// Login route to serve React login page
+Route::get('/login', [SPAController::class, 'index'])
+    ->name('login');
 
-// SPA Routes for Ticketing System
+// SPA Routes for Ticketing System - this should catch all SPA routes
 Route::get('/tickets/{path?}', [SPAController::class, 'index'])
     ->where('path', '.*')
     ->name('spa');
+
+// Catch all other SPA routes (dashboard, client, etc.)
+Route::get('/{path}', [SPAController::class, 'index'])
+    ->where('path', '^(?!api|_debugbar|storage).*')
+    ->name('spa-catchall');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

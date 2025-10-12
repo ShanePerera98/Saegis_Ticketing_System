@@ -2,7 +2,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
@@ -13,6 +12,7 @@ import CancelledTickets from './pages/CancelledTickets';
 import MergeCenter from './pages/MergeCenter';
 import Reports from './pages/Reports';
 import TemplateBuilder from './pages/TemplateBuilder';
+import UserManagement from './pages/UserManagement';
 import ActivityLogs from './components/ActivityLogs';
 import SystemStatus from './components/SystemStatus';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
   
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/tickets" />;
   }
   
   // Check role if required
@@ -150,6 +150,15 @@ const App = () => {
                 />
                 
                 <Route
+                  path="/users"
+                  element={
+                    <ProtectedRoute>
+                      <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
                   path="/system-status"
                   element={
                     <ProtectedRoute>
@@ -191,7 +200,6 @@ const App = () => {
           </Router>
         </AuthProvider>
       </ErrorBoundary>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };

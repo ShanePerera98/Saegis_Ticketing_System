@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\TicketTemplateController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ActivityLogController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -76,11 +77,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
     
-    // Activity logs
+    // Activity Log routes
     Route::prefix('activity-logs')->group(function () {
         Route::get('/', [ActivityLogController::class, 'index']);
         Route::get('/stats', [ActivityLogController::class, 'stats']);
         Route::get('/ticket/{ticketId}', [ActivityLogController::class, 'forTicket']);
         Route::get('/{activityLog}', [ActivityLogController::class, 'show']);
+    });
+
+    // User Management routes
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/{user}', [UserController::class, 'show']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::patch('/{user}', [UserController::class, 'update']);
+        Route::delete('/{user}', [UserController::class, 'destroy']);
+        Route::patch('/{user}/status', [UserController::class, 'updateStatus']);
     });
 });

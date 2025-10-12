@@ -61,11 +61,17 @@ class TicketController extends Controller
             'priority' => 'required|in:' . implode(',', TicketPriority::values()),
             'category_id' => 'nullable|exists:ticket_categories,id',
             'template_id' => 'nullable|exists:ticket_templates,id',
-            'client_id' => 'required_if:role,SUPER_ADMIN,ADMIN|exists:users,id',
+            'client_id' => 'nullable|exists:users,id',
             'field_values' => 'nullable|array',
+            'location' => 'nullable|string|max:255',
         ]);
 
         Gate::authorize('create', Ticket::class);
+
+        // If client_id is not provided and user is a client, use their own ID
+        if (!isset($validated['client_id']) && $user->role === 'CLIENT') {
+            $validated['client_id'] = $user->id;
+        }
 
         $ticket = $this->ticketService->createTicket($validated, $user);
 
