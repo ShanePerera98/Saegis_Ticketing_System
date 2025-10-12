@@ -1,8 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults, validateParameters } from './../wayfinder'
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults, validateParameters } from './../wayfinder'
 /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
 export const login = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,8 +15,8 @@ login.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
 login.url = (options?: RouteQueryOptions) => {
@@ -25,8 +24,8 @@ login.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
 login.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,8 +33,8 @@ login.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
 login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,8 +43,8 @@ login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
     /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
     const loginForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,8 +53,8 @@ login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     })
 
             /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
         loginForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,8 +62,8 @@ login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
             method: 'get',
         })
             /**
-* @see \App\Http\Controllers\Auth\AuthenticatedSessionController::login
- * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:20
+* @see \App\Http\Controllers\SPAController::login
+ * @see app/Http/Controllers/SPAController.php:7
  * @route '/login'
  */
         loginForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -305,6 +304,103 @@ spa.head = (args?: { path?: string | number } | [path: string | number ] | strin
         })
     
     spa.form = spaForm
+/**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+export const spaCatchall = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: spaCatchall.url(args, options),
+    method: 'get',
+})
+
+spaCatchall.definition = {
+    methods: ["get","head"],
+    url: '/{path}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+spaCatchall.url = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { path: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    path: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        path: args.path,
+                }
+
+    return spaCatchall.definition.url
+            .replace('{path}', parsedArgs.path.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+spaCatchall.get = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: spaCatchall.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+spaCatchall.head = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: spaCatchall.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+    const spaCatchallForm = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: spaCatchall.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+        spaCatchallForm.get = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: spaCatchall.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\SPAController::spaCatchall
+ * @see app/Http/Controllers/SPAController.php:7
+ * @route '/{path}'
+ */
+        spaCatchallForm.head = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: spaCatchall.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    spaCatchall.form = spaCatchallForm
 /**
 * @see \App\Http\Controllers\Auth\RegisteredUserController::register
  * @see app/Http/Controllers/Auth/RegisteredUserController.php:21

@@ -29,10 +29,10 @@ const Sidebar = ({ selectedStatus, onStatusChange, ticketCounts = {} }) => {
 
   const getRoleLabel = () => {
     const role = user?.role;
-    if (role === 'CLIENT') return 'Client Side';
-    if (role === 'ADMIN') return 'Admin Side';
-    if (role === 'SUPER_ADMIN') return 'Admin/Client Side';
-    return 'Side';
+    if (role === 'CLIENT') return 'Client';
+    if (role === 'ADMIN') return 'Admin';
+    if (role === 'SUPER_ADMIN') return 'Super Admin';
+    return 'User';
   };
 
   return (

@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Create basic users for testing (only if they don't exist)
         $superAdmin = User::firstOrCreate(
-            ['email' => 'super@admin.com'],
+            ['email' => 'super@log.com'],
             [
                 'name' => 'Super Administrator',
                 'password' => Hash::make('1234'),
@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $admin1 = User::firstOrCreate(
-            ['email' => 'admin@admin.com'],
+            ['email' => 'admin@log.com'],
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('1234'),
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $client1 = User::firstOrCreate(
-            ['email' => 'client@example.com'],
+            ['email' => 'client@log.com'],
             [
                 'name' => 'Client User',
                 'password' => Hash::make('1234'),
@@ -95,9 +95,9 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Database seeded successfully!');
         $this->command->info('Basic users created:');
-        $this->command->info('Super Admin: super@admin.com / password');
-        $this->command->info('Admin: admin@admin.com / password');
-        $this->command->info('Client: client@example.com / password');
+        $this->command->info('Super Admin: super@admin.com / 1234');
+        $this->command->info('Admin: admin@admin.com / 1234');
+        $this->command->info('Client: client@example.com / 1234');
         $this->command->info('Sample tickets and categories created.');
     }
 }

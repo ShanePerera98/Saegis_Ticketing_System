@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const HamburgerMenu = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -18,7 +20,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'See Others Queue', action: () => console.log('See Others Queue') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
         { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
-        { label: 'Manage Users', action: () => console.log('Manage Users') }
+        { label: 'Manage Users', action: () => navigate('/users') }
       ];
     } else if (role === 'SUPER_ADMIN') {
       return [
@@ -26,7 +28,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'Cancelled Tickets', action: () => console.log('Cancelled Tickets') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
         { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
-        { label: 'Manage Users', action: () => console.log('Manage Users') },
+        { label: 'Manage Users', action: () => navigate('/users') },
         { label: 'Reports & History', action: () => console.log('Reports & History') },
         { label: 'Archive', action: () => console.log('Archive') }
       ];
@@ -75,8 +77,8 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
           <div className="mb-6">
             <div className="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
               <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
-                {user?.role === 'CLIENT' ? 'Client Side' : 
-                 user?.role === 'ADMIN' ? 'Admin Side' : 'Admin/Client Side'}
+                {user?.role === 'CLIENT' ? 'Client' : 
+                 user?.role === 'ADMIN' ? 'Admin' : 'Super Admin'}
               </span>
             </div>
           </div>

@@ -12,6 +12,7 @@ import CancelledTickets from './pages/CancelledTickets';
 import MergeCenter from './pages/MergeCenter';
 import Reports from './pages/Reports';
 import TemplateBuilder from './pages/TemplateBuilder';
+import UserManagement from './pages/UserManagement';
 import ActivityLogs from './components/ActivityLogs';
 import SystemStatus from './components/SystemStatus';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -144,6 +145,15 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <ActivityLogs />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/users"
+                  element={
+                    <ProtectedRoute>
+                      <UserManagement />
                     </ProtectedRoute>
                   }
                 />

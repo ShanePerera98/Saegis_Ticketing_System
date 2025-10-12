@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [notifications, setNotifications] = useState([]); // Track notifications
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
@@ -20,6 +24,23 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark');
     }
+  }, []);
+
+  // Simulate fetching notifications (replace with actual API call)
+  useEffect(() => {
+    // For now, we'll assume no notifications
+    // You can replace this with actual notification fetching logic
+    const fetchNotifications = () => {
+      // Example: const response = await notificationApi.getUnread();
+      // setNotifications(response.data);
+      // setHasUnreadNotifications(response.data.length > 0);
+      
+      // For now, set to false (no notifications)
+      setNotifications([]);
+      setHasUnreadNotifications(false);
+    };
+
+    fetchNotifications();
   }, []);
 
   const toggleDarkMode = () => {
@@ -39,6 +60,27 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
 
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
+  };
+
+  const handleNotificationClick = () => {
+    // Handle notification click - could open a dropdown or navigate to notifications page
+    console.log('Notifications clicked');
+    // For testing: toggle notification state
+    // setHasUnreadNotifications(!hasUnreadNotifications);
+  };
+
+  // Navigation handler for the title
+  const handleTitleClick = () => {
+    const role = user?.role;
+    
+    if (role === 'CLIENT') {
+      navigate('/client/tickets');
+    } else if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+      navigate('/dashboard');
+    } else {
+      // Fallback navigation
+      navigate('/');
+    }
   };
 
   return (
@@ -68,12 +110,16 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
                 e.target.style.display = 'none';
               }}
             />
-            <span className="text-xl font-semibold text-gray-800 dark:text-gray-200 transition-colors">Saegis</span>
+            <span className="text-xl font-semibold text-gray-800 dark:text-gray-200 transition-colors">Saegis Campus</span>
           </div>
         </div>
         
         {/* Center Section - App Name */}
-        <div className="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-full transition-colors">
+        <div 
+          className="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-full transition-colors cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-500"
+          onClick={handleTitleClick}
+          title="Go to Home"
+        >
           <h1 className="text-lg font-medium text-gray-700 dark:text-gray-200 transition-colors">Saegis Help Desk</h1>
         </div>
         
@@ -100,16 +146,17 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           
           {/* Notifications */}
           <button 
+            onClick={handleNotificationClick}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 relative transition-colors"
             title="Notifications"
           >
             <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-3.405-3.405A2.032 2.032 0 0116 12.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C5.67 6.165 4 8.388 4 11v1.159c0 .538-.214 1.055-.595 1.436L0 17h5m10 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            {/* Notification badge - perfectly circular */}
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-            </span>
+            {/* Notification badge - only show when there are unread notifications */}
+            {hasUnreadNotifications && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
+            )}
           </button>
           
           {/* Profile Icon with Dropdown */}

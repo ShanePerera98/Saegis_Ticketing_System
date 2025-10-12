@@ -19,100 +19,78 @@ const Dashboard = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
 
-  // Mock data for demonstration
-  const mockTickets = [
-    {
-      id: 1,
-      title: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      location: 'Floor 2, Hall A',
-      priority: 'High',
-      status: 'NEW',
-      created_at: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
-      client_id: 'Client id'
+  // Fetch tickets using React Query
+  const { data: tickets = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['tickets', selectedStatus],
+    queryFn: () => {
+      const params = { status: selectedStatus === 'New' ? 'NEW' : selectedStatus.toUpperCase() };
+      // Don't add 'mine' parameter for admins to see all tickets
+      return ticketApi.list(params);
     },
-    {
-      id: 2,
-      title: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      location: 'Floor 1, Hall B',
-      priority: 'Medium',
-      status: 'NEW',
-      created_at: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-      client_id: 'Client id'
-    },
-    {
-      id: 3,
-      title: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      location: 'Floor 3, Hall C',
-      priority: 'Low',
-      status: 'NEW',
-      created_at: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
-      client_id: 'Client id'
-    },
-    {
-      id: 4,
-      title: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      location: 'Floor 4, Hall D',
-      priority: 'Urgent',
-      status: 'NEW',
-      created_at: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-      client_id: 'Client id'
-    },
-    {
-      id: 5,
-      title: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-      location: 'Floor 5, Hall E',
-      priority: 'High',
-      status: 'NEW',
-      created_at: new Date(Date.now() - 1200000).toISOString(), // 20 minutes ago
-      client_id: 'Client id'
-    }
-  ];
+    select: (data) => data.data.data || data.data || [],
+    staleTime: 30000, // 30 seconds
+    refetchInterval: 60000, // Refetch every minute
+  });
 
-  const handleTicketAction = (action, ticket, assignee = null) => {
-    console.log(`Action: ${action}`, ticket, assignee);
-    
-    switch (action) {
-      case 'get':
-        // Move ticket to user's "New" queue
-        alert(`Ticket ${ticket.id} has been added to your queue`);
-        break;
-      case 'cancel':
-        setSelectedTicket(ticket);
-        setShowCancelOptions(true);
-        break;
-      case 'assign':
-        // Assign ticket to selected staff member
-        alert(`Ticket ${ticket.id} has been assigned to ${assignee}`);
-        break;
-      case 'view':
-        // Show ticket details for clients
-        alert(`Viewing ticket details: ${ticket.title}`);
-        break;
-      default:
-        console.log('Unknown action:', action);
-    }
-  };
-
-  const handleCancelConfirm = (reason) => {
-    console.log(`Ticket ${selectedTicket?.id} canceled with reason: ${reason}`);
-    if (reason === 'Irrelevant') {
-      alert('Ticket moved to canceled queue');
-    } else if (reason === 'Duplicate') {
-      alert('Ticket moved to duplicate merge queue');
-    }
-    setShowCancelOptions(false);
-    setSelectedTicket(null);
-  };
+  // Fetch ticket statistics
+  const { data: stats = {} } = useQuery({
+    queryKey: ['ticket-stats'],
+    queryFn: () => ticketApi.getStats(),
+    select: (data) => data.data || {},
+    staleTime: 60000, // 1 minute
+  });
 
   const showToastMessage = (message, type = 'success') => {
     setToastMessage(message);
     setToastType(type);
     setShowToast(true);
+  };
+
+  const handleTicketAction = async (action, ticket, assignee = null) => {
+    try {
+      switch (action) {
+        case 'get':
+          await ticketApi.assignSelf(ticket.id);
+          showToastMessage(`Ticket ${ticket.id} has been added to your queue`, 'success');
+          refetch(); // Refresh the ticket list
+          break;
+        case 'cancel':
+          setSelectedTicket(ticket);
+          setShowCancelOptions(true);
+          break;
+        case 'assign':
+          if (assignee) {
+            await ticketApi.assign(ticket.id, assignee);
+            showToastMessage(`Ticket ${ticket.id} has been assigned to ${assignee}`, 'success');
+            refetch(); // Refresh the ticket list
+          }
+          break;
+        case 'view':
+          showToastMessage(`Viewing ticket details: ${ticket.title}`, 'info');
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } catch (error) {
+      showToastMessage(error.response?.data?.message || 'Action failed', 'error');
+    }
+  };
+
+  const handleCancelConfirm = async (reason) => {
+    try {
+      if (reason === 'Irrelevant') {
+        await ticketApi.cancelIrrelevant(selectedTicket.id, reason);
+        showToastMessage('Ticket moved to canceled queue', 'success');
+      } else if (reason === 'Duplicate') {
+        showToastMessage('Ticket moved to duplicate merge queue', 'info');
+        // TODO: Implement duplicate merge API call
+      }
+      setShowCancelOptions(false);
+      setSelectedTicket(null);
+      refetch(); // Refresh the ticket list
+    } catch (error) {
+      showToastMessage(error.response?.data?.message || 'Failed to cancel ticket', 'error');
+    }
   };
 
   const hideToast = () => {
@@ -127,20 +105,49 @@ const Dashboard = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Mock ticket counts for sidebar
+  // Calculate ticket counts from stats API or fallback to default values
   const ticketCounts = {
-    'New': 5,
-    'In Progress': 3,
-    'Pending': 1,
-    'Resolved': 12,
-    'Canceled': 0,
-    'Closed': 2,
-    'Deleted': 0,
-    'See Others Queue': 25
+    'New': stats.new || 0,
+    'In Progress': stats.in_progress || 0,
+    'Pending': stats.pending || 0,
+    'Resolved': stats.resolved || 0,
+    'Canceled': stats.canceled || 0,
+    'Closed': stats.closed || 0,
+    'Deleted': stats.deleted || 0,
+    'See Others Queue': stats.others_queue || 0
   };
 
-  // Filter tickets based on selected status (this would be actual API call in real implementation)
-  const filteredTickets = selectedStatus === 'New' ? mockTickets : [];
+  // Filter tickets based on selected status
+  const filteredTickets = tickets || [];
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tickets...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">Error loading tickets: {error.message}</p>
+          <button 
+            onClick={() => refetch()} 
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
