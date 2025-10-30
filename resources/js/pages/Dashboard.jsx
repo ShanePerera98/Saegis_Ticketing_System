@@ -166,8 +166,8 @@ const Dashboard = () => {
         />
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="space-y-4">
+        <main className="flex-1 p-6 elastic-scroll overflow-y-auto">
+          <div className="space-y-4 scroll-shadow">
             {filteredTickets.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400 transition-colors">No tickets found for "{selectedStatus}" status</p>

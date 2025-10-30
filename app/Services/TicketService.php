@@ -23,7 +23,7 @@ class TicketService
                 'priority' => $data['priority'],
                 'category_id' => $data['category_id'] ?? null,
                 'template_id' => $data['template_id'] ?? null,
-                'client_id' => $user->isClient() ? $user->id : $data['client_id'],
+                'client_id' => $user->isClient() ? $user->id : ($data['client_id'] ?? $user->id),
                 'created_by' => $user->id,
                 'status' => TicketStatus::NEW,
             ]);

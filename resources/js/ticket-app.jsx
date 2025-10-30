@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Import elastic scroll system for enhanced UX
+import './utils/elasticScroll.js';
+
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -13,6 +16,7 @@ import MergeCenter from './pages/MergeCenter';
 import Reports from './pages/Reports';
 import TemplateBuilder from './pages/TemplateBuilder';
 import UserManagement from './pages/UserManagement';
+import HeadsUpNoticeManager from './pages/HeadsUpNoticeManager';
 import ActivityLogs from './components/ActivityLogs';
 import SystemStatus from './components/SystemStatus';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -154,6 +158,15 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/headsup-notice"
+                  element={
+                    <ProtectedRoute>
+                      <HeadsUpNoticeManager />
                     </ProtectedRoute>
                   }
                 />

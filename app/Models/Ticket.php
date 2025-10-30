@@ -291,28 +291,27 @@ class Ticket extends Model
         };
     }
 
-    public function getPriorityColorAttribute(): string
-    {
-        return match ($this->priority) {
-            TicketPriority::LOW => 'green',
-            TicketPriority::MEDIUM => 'blue',
-            TicketPriority::HIGH => 'orange',
-            TicketPriority::URGENT => 'red',
-            default => 'gray',
-        };
-    }
-
     protected static function generateTicketNumber(): string
     {
         $prefix = 'TKT';
         $date = now()->format('Ymd');
         
-        $lastTicket = self::whereDate('created_at', now()->toDateString())
-                         ->orderBy('id', 'desc')
-                         ->first();
+        // Get all ticket numbers for today including soft deleted and find the highest sequence
+        $todayTickets = self::withTrashed()->where('ticket_number', 'LIKE', $prefix . '-' . $date . '-%')
+                           ->pluck('ticket_number')
+                           ->toArray();
         
-        $sequence = $lastTicket ? (int) substr($lastTicket->ticket_number, -4) + 1 : 1;
+        $maxSequence = 0;
+        foreach ($todayTickets as $ticketNumber) {
+            $parts = explode('-', $ticketNumber);
+            if (count($parts) === 3) {
+                $sequence = (int) $parts[2];
+                $maxSequence = max($maxSequence, $sequence);
+            }
+        }
         
-        return $prefix . '-' . $date . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        $newSequence = $maxSequence + 1;
+        
+        return $prefix . '-' . $date . '-' . str_pad($newSequence, 4, '0', STR_PAD_LEFT);
     }
 }

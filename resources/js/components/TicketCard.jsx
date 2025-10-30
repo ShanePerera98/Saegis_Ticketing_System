@@ -8,6 +8,39 @@ const TicketCard = ({ ticket, onAction }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedAssignee, setSelectedAssignee] = useState('');
 
+  // Get priority class for gradient border
+  const getPriorityClass = (priority) => {
+    switch(priority?.toUpperCase()) {
+      case 'CRITICAL':
+        return 'priority-critical';
+      case 'HIGH':
+        return 'priority-high';
+      case 'MEDIUM':
+        return 'priority-medium';
+      case 'LOW':
+        return 'priority-low';
+      default:
+        return '';
+    }
+  };
+
+  // Get priority badge styling
+  const getPriorityBadge = (priority) => {
+    const baseBadge = "px-2 py-1 rounded-full text-xs font-medium";
+    switch(priority?.toUpperCase()) {
+      case 'CRITICAL':
+        return `${baseBadge} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
+      case 'HIGH':
+        return `${baseBadge} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200`;
+      case 'MEDIUM':
+        return `${baseBadge} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
+      case 'LOW':
+        return `${baseBadge} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
+      default:
+        return `${baseBadge} bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200`;
+    }
+  };
+
   // Timer logic - starts from ticket creation and counts up
   useEffect(() => {
     const startTime = new Date(ticket.created_at);
@@ -39,8 +72,8 @@ const TicketCard = ({ ticket, onAction }) => {
       // Clients just view details
       onAction('view', ticket);
     } else {
-      // Admins and Super Admins see action options
-      setShowActions(true);
+      // Admins and Super Admins toggle action options
+      setShowActions(!showActions);
     }
   };
 
@@ -69,14 +102,20 @@ const TicketCard = ({ ticket, onAction }) => {
 
   if (showAssignModal) {
     return (
-      <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg transition-colors">
+      <div className={`bg-gray-200 dark:bg-gray-700 p-4 rounded-lg transition-colors ${getPriorityClass(ticket.priority)}`}>
         <div className="mb-4">
           <div className="font-medium text-gray-800 dark:text-gray-200 transition-colors">Issue Type: {ticket.title}</div>
           <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">{ticket.description}</div>
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
-            <span>Location: {ticket.location || 'Not specified'}</span>
-            <span>Raised by: Client id</span>
-            <span>Priority: {ticket.priority}</span>
+          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
+            <div className="flex items-center gap-3">
+              <span>Location: {ticket.location || 'Not specified'}</span>
+              <span>Raised by: Client id</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={getPriorityBadge(ticket.priority)}>
+                {ticket.priority || 'MEDIUM'}
+              </span>
+            </div>
           </div>
         </div>
         
@@ -117,18 +156,30 @@ const TicketCard = ({ ticket, onAction }) => {
 
   if (showActions) {
     return (
-      <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg transition-colors">
+      <div 
+        className={`bg-gray-200 dark:bg-gray-700 p-4 cursor-pointer transition-colors hover:bg-gray-300 dark:hover:bg-gray-600 ${getPriorityClass(ticket.priority)}`}
+        onClick={handleCardClick}
+        title="Click to hide actions"
+        style={{ borderRadius: '9px' }}
+      >
         <div className="mb-4">
           <div className="font-medium text-gray-800 dark:text-gray-200 transition-colors">Issue Type: {ticket.title}</div>
           <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">{ticket.description}</div>
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
-            <span>Location: {ticket.location || 'Not specified'}</span>
-            <span>Raised by: Client id</span>
-            <span>Priority: {ticket.priority}</span>
+          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
+            <div className="flex items-center gap-3">
+              <span>Location: {ticket.location || 'Not specified'}</span>
+              <span>Raised by: Client id</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={getPriorityBadge(ticket.priority)}>
+                {ticket.priority || 'MEDIUM'}
+              </span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">• Click to hide</span>
+            </div>
           </div>
         </div>
         
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={handleGet}
             className="px-4 py-2 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 transition-colors"
@@ -156,8 +207,10 @@ const TicketCard = ({ ticket, onAction }) => {
 
   return (
     <div 
-      className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+      className={`bg-gray-200 dark:bg-gray-700 p-4 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 ${getPriorityClass(ticket.priority)}`}
       onClick={handleCardClick}
+      title="Click to show actions"
+      style={{ borderRadius: '9px' }}
     >
       <div className="flex justify-between items-start mb-2">
         <div className="font-medium text-gray-800 dark:text-gray-200 transition-colors">Issue Type: {ticket.title}</div>
@@ -168,10 +221,19 @@ const TicketCard = ({ ticket, onAction }) => {
         {ticket.description}
       </div>
       
-      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 transition-colors">
-        <span>Location: {ticket.location || 'Not specified'}</span>
-        <span>Raised by: Client id</span>
-        <span>Priority: {ticket.priority}</span>
+      <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 transition-colors">
+        <div className="flex items-center gap-3">
+          <span>Location: {ticket.location || 'Not specified'}</span>
+          <span>Raised by: Client id</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={getPriorityBadge(ticket.priority)}>
+            {ticket.priority || 'MEDIUM'}
+          </span>
+          {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
+            <span className="text-xs text-gray-400 dark:text-gray-500">• Click for actions</span>
+          )}
+        </div>
       </div>
     </div>
   );

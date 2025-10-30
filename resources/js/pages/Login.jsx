@@ -46,7 +46,7 @@ const Login = () => {
         <div>
           <div className="flex justify-center mb-6">
             <img 
-              src="/saegis-logo.svg" 
+              src="/saegislogo.jpg" 
               alt="Saegis Campus" 
               className="h-16 w-auto"
             />

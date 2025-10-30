@@ -20,7 +20,8 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'See Others Queue', action: () => console.log('See Others Queue') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
         { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
-        { label: 'Manage Users', action: () => navigate('/users') }
+        { label: 'Manage Users', action: () => navigate('/users') },
+        { label: 'My Ticket History', action: () => console.log('My Ticket History') }
       ];
     } else if (role === 'SUPER_ADMIN') {
       return [
@@ -28,7 +29,9 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'Cancelled Tickets', action: () => console.log('Cancelled Tickets') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
         { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
+        { label: 'Heads Up Notice', action: () => navigate('/headsup-notice') },
         { label: 'Manage Users', action: () => navigate('/users') },
+        { label: 'My Ticket History', action: () => console.log('My Ticket History') },
         { label: 'Reports & History', action: () => console.log('Reports & History') },
         { label: 'Archive', action: () => console.log('Archive') }
       ];
@@ -41,14 +44,15 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay - only cover the right side content area */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-30 z-30 transition-all duration-300"
+        style={{ left: '320px' }}
         onClick={onClose}
       ></div>
       
       {/* Menu */}
-      <div className="fixed left-0 top-0 h-full w-80 bg-gray-100 dark:bg-gray-800 z-50 shadow-lg transition-colors duration-200">
+      <div className="fixed left-0 top-0 h-full w-80 bg-gray-100 dark:bg-gray-800 z-40 shadow-lg transition-colors duration-200">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

@@ -1,0 +1,637 @@
+/* Global UI Improvements */
+
+/* Enhanced elastic scrolling with bounce effects */
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  scroll-snap-type: y proximity;
+}
+
+body {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Universal elastic scroll containers */
+.elastic-scroll,
+.overflow-y-auto,
+.overflow-auto,
+[style*="overflow-y: auto"],
+[style*="overflow: auto"] {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overscroll-behavior: contain;
+}
+
+/* Webkit scroll enhancement for elastic effect */
+.elastic-scroll::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.elastic-scroll::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-auto::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.elastic-scroll::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb,
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.elastic-scroll::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+/* Dark mode scrollbar */
+.dark .elastic-scroll::-webkit-scrollbar-thumb,
+.dark .overflow-y-auto::-webkit-scrollbar-thumb,
+.dark .overflow-auto::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.4);
+}
+
+.dark .elastic-scroll::-webkit-scrollbar-thumb:hover,
+.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.dark .overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 85, 99, 0.7);
+}
+
+/* Bounce effect animations */
+.bounce-scroll {
+  animation: bounceScrollEnd 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.bounce-scroll-top {
+  animation: bounceScrollTop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceScrollEnd {
+  0% { 
+    transform: translateY(0);
+  }
+  25% { 
+    transform: translateY(-8px);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: translateY(3px);
+  }
+  75% { 
+    transform: translateY(-2px);
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceScrollTop {
+  0% { 
+    transform: translateY(0);
+  }
+  25% { 
+    transform: translateY(8px);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: translateY(-3px);
+  }
+  75% { 
+    transform: translateY(2px);
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Elastic scroll momentum effect */
+.momentum-scroll {
+  animation: momentumScroll 0.6s ease-out;
+}
+
+@keyframes momentumScroll {
+  0% { 
+    transform: scale(1);
+  }
+  30% { 
+    transform: scale(0.98);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
+/* Disable bounce effects for header and sidebar with maximum specificity */
+header,
+.header,
+nav,
+.navbar,
+.sidebar,
+.side-menu,
+.navigation,
+aside,
+[data-component="header"],
+[data-component="sidebar"],
+[data-component="navigation"],
+.fixed,
+.sticky,
+header *,
+.header *,
+nav *,
+.navbar *,
+.sidebar *,
+.side-menu *,
+.navigation *,
+aside * {
+  /* Keep smooth scrolling but disable bounce animations */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: none !important;
+  animation: none !important;
+  transform: none !important;
+  transition: transform 0s !important;
+}
+
+/* Specifically disable bounce classes for navigation elements with highest specificity */
+header.bounce-scroll,
+.header.bounce-scroll,
+nav.bounce-scroll,
+.navbar.bounce-scroll,
+.sidebar.bounce-scroll,
+.side-menu.bounce-scroll,
+.navigation.bounce-scroll,
+aside.bounce-scroll,
+header.bounce-scroll-top,
+.header.bounce-scroll-top,
+nav.bounce-scroll-top,
+.navbar.bounce-scroll-top,
+.sidebar.bounce-scroll-top,
+.side-menu.bounce-scroll-top,
+.navigation.bounce-scroll-top,
+aside.bounce-scroll-top,
+header.bounce-scroll *,
+.header.bounce-scroll *,
+nav.bounce-scroll *,
+.navbar.bounce-scroll *,
+.sidebar.bounce-scroll *,
+.side-menu.bounce-scroll *,
+.navigation.bounce-scroll *,
+aside.bounce-scroll *,
+header.bounce-scroll-top *,
+.header.bounce-scroll-top *,
+nav.bounce-scroll-top *,
+.navbar.bounce-scroll-top *,
+.sidebar.bounce-scroll-top *,
+.side-menu.bounce-scroll-top *,
+.navigation.bounce-scroll-top *,
+aside.bounce-scroll-top * {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Additional exclusions for common header/sidebar styling patterns */
+.bg-white.shadow-sm.border-b,
+.bg-white.shadow-sm.border-r,
+.w-64.bg-white.shadow-sm,
+.min-h-screen.bg-white,
+.bg-white.shadow-sm.border-b *,
+.bg-white.shadow-sm.border-r *,
+.w-64.bg-white.shadow-sm *,
+.min-h-screen.bg-white * {
+  animation: none !important;
+  transform: none !important;
+  overscroll-behavior: none !important;
+}
+
+/* Elastic scroll classes should not apply to navigation elements */
+header.elastic-scroll,
+.header.elastic-scroll,
+nav.elastic-scroll,
+.navbar.elastic-scroll,
+aside.elastic-scroll,
+.sidebar.elastic-scroll,
+.side-menu.elastic-scroll,
+.navigation.elastic-scroll,
+header.elastic-scroll *,
+.header.elastic-scroll *,
+nav.elastic-scroll *,
+.navbar.elastic-scroll *,
+aside.elastic-scroll *,
+.sidebar.elastic-scroll *,
+.side-menu.elastic-scroll *,
+.navigation.elastic-scroll * {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Enhanced scroll indicators */
+.elastic-scroll {
+  position: relative;
+}
+
+.elastic-scroll::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.elastic-scroll::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.elastic-scroll.scrolling::before,
+.elastic-scroll.scrolling::after {
+  opacity: 1;
+}
+
+/* Scroll shadow effects */
+.scroll-shadow {
+  background: 
+    linear-gradient(white 30%, rgba(255,255,255,0)),
+    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+    radial-gradient(50% 0, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)),
+    radial-gradient(50% 100%, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.dark .scroll-shadow {
+  background: 
+    linear-gradient(#374151 30%, rgba(55,65,81,0)),
+    linear-gradient(rgba(55,65,81,0), #374151 70%) 0 100%,
+    radial-gradient(50% 0, farthest-side, rgba(0,0,0,.3), rgba(0,0,0,0)),
+    radial-gradient(50% 100%, farthest-side, rgba(0,0,0,.3), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: #374151;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Elastic overscroll behavior */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+.overscroll-bounce {
+  overscroll-behavior: auto;
+}
+
+/* Touch scroll enhancement */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.touch-scroll-x {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.touch-scroll-both {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* Global elastic scroll application */
+.overflow-y-auto,
+.overflow-auto,
+.overflow-x-auto,
+main,
+.modal-content,
+.dialog-content,
+.dropdown-menu,
+.sidebar,
+.content-area,
+.ticket-list,
+.table-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Auto-apply elastic scroll to containers with specific heights */
+[style*="max-height"],
+[style*="height: "],
+.h-screen,
+.h-full,
+.max-h-screen,
+.max-h-full {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Rounded corners for all interactive elements */
+button, 
+input, 
+select, 
+textarea,
+.dropdown-option,
+.menu-item,
+.card,
+.modal {
+  border-radius: 8px !important;
+  transition: all 0.25s ease;
+}
+
+/* Enhanced dropdown styles */
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  background: white;
+  overflow: hidden;
+}
+
+.dark .dropdown-menu {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dropdown-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.15s ease;
+}
+
+.dark .dropdown-option {
+  border-bottom-color: #4b5563;
+}
+
+.dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.dropdown-option:hover {
+  background-color: #f5f5dc !important;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.dark .dropdown-option:hover {
+  background-color: #4b5563 !important;
+}
+
+/* Hamburger menu squeeze effect */
+.content-squeezed {
+  transform: translateX(320px);
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: calc(100% - 320px);
+}
+
+.content-normal {
+  transform: translateX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 100%;
+}
+
+/* Notification badge */
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.dark .notification-badge {
+  border-color: #1f2937;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.dark .modal-content {
+  background: #1f2937;
+  color: white;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Ticket priority borders */
+.priority-high {
+  border: 3px solid #ff7900;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.priority-medium {
+  border: 3px solid #007fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.priority-low {
+  border: 3px solid #01ff01;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.priority-critical {
+  border: 3px solid #ff2400;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Ticket hover and click effects */
+.ticket-card:hover {
+  background-color: white !important;
+  color: black !important;
+}
+
+.dark .ticket-card:hover {
+  background-color: white !important;
+  color: black !important;
+}
+
+.ticket-card.clicked {
+  background-color: #f5f5dc !important;
+}
+
+/* Scroll to top button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  background: #374151;
+  color: white;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.scroll-to-top:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dark .scroll-to-top {
+  background: #6b7280;
+}
+
+.dark .scroll-to-top:hover {
+  background: #9ca3af;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+  .content-squeezed {
+    transform: translateX(280px);
+    width: calc(100% - 280px);
+  }
+  
+  .modal-content {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .dropdown-menu {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-squeezed {
+    transform: translateX(260px);
+    width: calc(100% - 260px);
+  }
+}
+
+/* HeadsUpNotice styles */
+.headsup-notice {
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .headsup-notice {
+  background: linear-gradient(135deg, #451a03 0%, #92400e 100%);
+  border-color: #d97706;
+  color: #fbbf24;
+}
+
+.headsup-notice h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.dark .headsup-notice h3 {
+  color: #fbbf24;
+}
+
+/* File input styling */
+.file-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.file-input-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.file-input-btn:hover {
+  background: #e5e7eb;
+}
+
+.dark .file-input-btn {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
+}
+
+.dark .file-input-btn:hover {
+  background: #6b7280;
+}

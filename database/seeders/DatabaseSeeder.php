@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'super@log.com'],
             [
                 'name' => 'Super Administrator',
-                'password' => Hash::make('1234'),
+                'password' => Hash::make('789789'),
                 'role' => UserRole::SUPER_ADMIN,
                 'is_active' => true,
             ]
@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@log.com'],
             [
                 'name' => 'Admin User',
-                'password' => Hash::make('1234'),
+                'password' => Hash::make('789789'),
                 'role' => UserRole::ADMIN,
                 'is_active' => true,
             ]
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'client@log.com'],
             [
                 'name' => 'Client User',
-                'password' => Hash::make('1234'),
+                'password' => Hash::make('789789'),
                 'role' => UserRole::CLIENT,
                 'is_active' => true,
             ]

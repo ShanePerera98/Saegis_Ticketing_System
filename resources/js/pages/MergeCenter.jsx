@@ -219,7 +219,7 @@ const MergeCenter = () => {
                     <option value="LOW">Low</option>
                     <option value="MEDIUM">Medium</option>
                     <option value="HIGH">High</option>
-                    <option value="URGENT">Urgent</option>
+                    <option value="CRITICAL">Critical</option>
                   </select>
                 </div>
                 

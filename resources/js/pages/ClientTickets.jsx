@@ -6,6 +6,9 @@ import CommonHeader from '../components/CommonHeader';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Sidebar from '../components/Sidebar';
 import Toast from '../components/Toast';
+import ScrollToTop from '../components/ScrollToTop';
+import ContentWrapper from '../components/ContentWrapper';
+import HeadsUpNotice from '../components/HeadsUpNotice';
 
 const ClientTickets = () => {
   const { user } = useAuth();
@@ -22,6 +25,8 @@ const ClientTickets = () => {
     hall: '',
     description: ''
   });
+  const [attachedImages, setAttachedImages] = useState([]);
+  const [attachedFiles, setAttachedFiles] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,8 +43,61 @@ const ClientTickets = () => {
     setShowToast(false);
   };
 
+  // File attachment handlers
+  const handleImageAttach = (e) => {
+    const files = Array.from(e.target.files);
+    const validImages = files.filter(file => {
+      const isImage = file.type.startsWith('image/');
+      const isValidSize = file.size <= 3 * 1024 * 1024; // 3MB limit
+      
+      if (!isImage) {
+        showToastMessage('Please select only image files', 'error');
+        return false;
+      }
+      if (!isValidSize) {
+        showToastMessage('Image size must be less than 3MB', 'error');
+        return false;
+      }
+      return true;
+    });
+    
+    setAttachedImages(prev => [...prev, ...validImages]);
+    e.target.value = ''; // Reset input
+  };
+
+  const handleFileAttach = (e) => {
+    const files = Array.from(e.target.files);
+    const validFiles = files.filter(file => {
+      const isValidSize = file.size <= 20 * 1024 * 1024; // 20MB limit
+      
+      if (!isValidSize) {
+        showToastMessage('File size must be less than 20MB', 'error');
+        return false;
+      }
+      return true;
+    });
+    
+    setAttachedFiles(prev => [...prev, ...validFiles]);
+    e.target.value = ''; // Reset input
+  };
+
+  const removeImage = (index) => {
+    setAttachedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeFile = (index) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate priority is selected
+    if (!formData.priority || formData.priority.trim() === '') {
+      showToastMessage('Please select a priority for your ticket.', 'error');
+      return;
+    }
+    
     try {
       // Convert form data to API format
       const ticketData = {
@@ -52,7 +110,7 @@ const ClientTickets = () => {
       
       console.log('Sending ticket data:', ticketData);
       await ticketApi.create(ticketData);
-      // Reset form
+      // Reset form and attachments
       setFormData({
         issueType: '',
         priority: '',
@@ -61,6 +119,8 @@ const ClientTickets = () => {
         hall: '',
         description: ''
       });
+      setAttachedImages([]);
+      setAttachedFiles([]);
       showToastMessage('Ticket created successfully!', 'success');
     } catch (error) {
       console.error('Failed to create ticket:', error);
@@ -86,43 +146,38 @@ const ClientTickets = () => {
 
   // Mock ticket counts for sidebar
   const ticketCounts = {
-    'New': 5,
-    'In Progress': 3,
-    'Pending': 1,
-    'Resolved': 12,
+    'New': 0,
+    'In Progress': 0,
+    'Pending': 0,
+    'Resolved': 0,
     'Canceled': 0,
-    'Closed': 2,
+    'Closed': 0,
     'Deleted': 0
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+    <>
       {/* Common Header */}
       <CommonHeader onMenuToggle={toggleMenu} isMenuOpen={isMenuOpen} />
       
       {/* Hamburger Menu */}
       <HamburgerMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
-      <div className="flex">
-        {/* Sidebar */}
-        <Sidebar 
-          selectedStatus={selectedStatus}
-          onStatusChange={handleStatusChange}
-          ticketCounts={ticketCounts}
-        />
+      <ContentWrapper isMenuOpen={isMenuOpen}>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+          <div className="flex">
+          {/* Sidebar */}
+          <Sidebar 
+            selectedStatus={selectedStatus}
+            onStatusChange={handleStatusChange}
+            ticketCounts={ticketCounts}
+          />
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl">
-            {/* Create Ticket Header */}
-            <div className="bg-blue-500 dark:bg-blue-600 text-white text-center py-4 rounded-lg mb-6 transition-colors">
-              <h2 className="text-xl font-semibold flex items-center justify-center">
-                Create Ticket
-                <span className="ml-2 w-6 h-6 bg-white text-blue-500 dark:text-blue-600 rounded-full flex items-center justify-center text-lg font-bold">
-                  +
-                </span>
-              </h2>
-            </div>
+          {/* Main Content */}
+          <main className="flex-1 p-6 elastic-scroll overflow-y-auto scroll-shadow">
+            <div className="max-w-4xl mx-auto">
+              {/* Heads Up Notice - Replaces Create Ticket Header */}
+              <HeadsUpNotice />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,15 +188,15 @@ const ClientTickets = () => {
                   value={formData.issueType}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+                  className="dropdown-menu w-full px-4 py-3 pr-10 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors appearance-none"
                 >
-                  <option value="">Issue Type</option>
-                  <option value="Technical Support">Technical Support</option>
-                  <option value="Hardware Issue">Hardware Issue</option>
-                  <option value="Software Issue">Software Issue</option>
-                  <option value="Network Issue">Network Issue</option>
-                  <option value="Account Access">Account Access</option>
-                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="" disabled hidden>Select Issue Type</option>
+                  <option value="Technical Issue" className="dropdown-option">Technical Issue</option>
+                  <option value="Hardware Issue" className="dropdown-option">Hardware Issue</option>
+                  <option value="Software Issue" className="dropdown-option">Software Issue</option>
+                  <option value="Network Issue" className="dropdown-option">Network Issue</option>
+                  <option value="Account Access" className="dropdown-option">Account Access</option>
+                  <option value="General Inquiry" className="dropdown-option">General Inquiry</option>
                 </select>
               </div>
 
@@ -152,13 +207,13 @@ const ClientTickets = () => {
                   value={formData.priority}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+                  className="dropdown-menu w-full px-4 py-3 pr-10 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors appearance-none"
                 >
-                  <option value="">Priority</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
+                  <option value="" disabled hidden>Priority</option>
+                  <option value="high" className="dropdown-option">High</option>
+                  <option value="medium" className="dropdown-option">Medium</option>
+                  <option value="low" className="dropdown-option">Low</option>
+                  <option value="critical" className="dropdown-option">Critical</option>
                 </select>
               </div>
 
@@ -168,13 +223,14 @@ const ClientTickets = () => {
                   name="affectedUsers"
                   value={formData.affectedUsers}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+                  className="dropdown-menu w-full px-4 py-3 pr-10 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors appearance-none"
                 >
-                  <option value="">Affected Users</option>
-                  <option value="single">Single User</option>
-                  <option value="multiple">Multiple Users</option>
-                  <option value="department">Entire Department</option>
-                  <option value="company">Company Wide</option>
+                  <option value="" disabled hidden>Affected Users</option>
+                  <option value="single" className="dropdown-option">Only Me</option>
+                  <option value="multiple" className="dropdown-option">Less than 3</option>
+                  <option value="multiple" className="dropdown-option">Less than 5</option>
+                  <option value="multiple" className="dropdown-option">Less than 10</option>
+                  <option value="department" className="dropdown-option">Entire Room</option>
                 </select>
               </div>
 
@@ -182,28 +238,110 @@ const ClientTickets = () => {
               <div>
                 <div className="text-gray-700 dark:text-gray-300 font-medium mb-2 transition-colors">Location</div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
+                  <select
                     name="floor"
                     value={formData.floor}
                     onChange={handleInputChange}
-                    placeholder="Floor"
-                    className="px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
-                  />
-                  <input
-                    type="text"
+                    className="dropdown-menu px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+                  >
+                    <option value="" disabled hidden>Floor</option>
+                    <option value="Ground Floor" className="dropdown-option">Ground Floor</option>
+                    <option value="1st Floor" className="dropdown-option">1st Floor</option>
+                    <option value="2nd Floor" className="dropdown-option">2nd Floor</option>
+                    <option value="3rd Floor" className="dropdown-option">3rd Floor</option>
+                    <option value="4th Floor" className="dropdown-option">4th Floor</option>
+                    <option value="5th Floor" className="dropdown-option">5th Floor</option>
+                    <option value="Basement" className="dropdown-option">Basement</option>
+                  </select>
+                  <select
                     name="hall"
                     value={formData.hall}
                     onChange={handleInputChange}
-                    placeholder="Hall"
-                    className="px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
-                  />
+                    className="dropdown-menu px-4 py-3 bg-gray-200 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+                  >
+                    <option value="" disabled hidden>Hall</option>
+                    <option value="Hall A" className="dropdown-option">Hall A</option>
+                    <option value="Hall B" className="dropdown-option">Hall B</option>
+                    <option value="Hall C" className="dropdown-option">Hall C</option>
+                    <option value="Hall D" className="dropdown-option">Hall D</option>
+                    <option value="Computer Lab 1" className="dropdown-option">Computer Lab 1</option>
+                    <option value="Computer Lab 2" className="dropdown-option">Computer Lab 2</option>
+                    <option value="Library" className="dropdown-option">Library</option>
+                    <option value="Cafeteria" className="dropdown-option">Cafeteria</option>
+                    <option value="Admin Office" className="dropdown-option">Admin Office</option>
+                  </select>
                 </div>
               </div>
 
               {/* Description */}
               <div>
                 <div className="text-gray-700 dark:text-gray-300 font-medium mb-2 transition-colors">Description :</div>
+                
+                {/* File Attachment Options */}
+                <div className="file-input-container mb-2">
+                  <label className="file-input-btn">
+                    📎 Attach Image
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageAttach}
+                      className="hidden"
+                    />
+                  </label>
+                  <label className="file-input-btn">
+                    📄 Attach File
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileAttach}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* Attached Images Display */}
+                {attachedImages.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Attached Images:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {attachedImages.map((image, index) => (
+                        <div key={index} className="flex items-center bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-sm">
+                          <span className="text-blue-700 dark:text-blue-300">{image.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="ml-2 text-red-500 hover:text-red-700"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Attached Files Display */}
+                {attachedFiles.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Attached Files:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {attachedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center bg-green-100 dark:bg-green-900 px-2 py-1 rounded text-sm">
+                          <span className="text-green-700 dark:text-green-300">{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="ml-2 text-red-500 hover:text-red-700"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <textarea
                   name="description"
                   value={formData.description}
@@ -227,14 +365,9 @@ const ClientTickets = () => {
             </form>
           </div>
         </main>
-      </div>
-
-      {/* Question Mark Help Icon */}
-      <div className="fixed bottom-6 right-6">
-        <div className="w-12 h-12 bg-gray-800 dark:bg-gray-700 text-white rounded-full flex items-center justify-center text-xl font-bold cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
-          ?
+          </div>
         </div>
-      </div>
+      </ContentWrapper>
 
       {/* Toast Notification */}
       <Toast
@@ -244,7 +377,10 @@ const ClientTickets = () => {
         onClose={hideToast}
         duration={4000}
       />
-    </div>
+      
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
+    </>
   );
 };
 

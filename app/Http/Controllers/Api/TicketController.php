@@ -55,6 +55,11 @@ class TicketController extends Controller
     {
         $user = $request->user();
         
+        // Handle empty priority values before validation
+        if ($request->has('priority') && (is_null($request->priority) || trim($request->priority) === '')) {
+            $request->merge(['priority' => 'MEDIUM']);
+        }
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
