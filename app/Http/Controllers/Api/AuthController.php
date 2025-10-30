@@ -15,6 +15,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'remember' => 'boolean',
         ]);
 
         $user = User::where('email', $request->email)->where('is_active', true)->first();
@@ -25,7 +26,15 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        // Create token with different expiration based on remember me
+        $tokenName = 'api-token';
+        if ($request->boolean('remember')) {
+            // Remember me tokens last 30 days
+            $token = $user->createToken($tokenName, ['*'], now()->addDays(30))->plainTextToken;
+        } else {
+            // Regular tokens last 1 day
+            $token = $user->createToken($tokenName, ['*'], now()->addDay())->plainTextToken;
+        }
 
         return response()->json([
             'token' => $token,

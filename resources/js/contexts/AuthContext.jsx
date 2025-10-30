@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
   const [abilities, setAbilities] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const savedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
@@ -27,7 +27,9 @@ export const AuthProvider = ({ children }) => {
         .then(response => {
           setUser(response.data.user);
           setAbilities(response.data.abilities);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          // Update the same storage type that was originally used
+          const storageType = localStorage.getItem('token') ? localStorage : sessionStorage;
+          storageType.setItem('user', JSON.stringify(response.data.user));
         })
         .catch(() => {
           // Token is invalid
@@ -46,8 +48,11 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.login(credentials);
       const { token, user: userData, abilities: userAbilities } = response.data;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      // Choose storage based on remember me option
+      const storage = credentials.remember ? localStorage : sessionStorage;
+      
+      storage.setItem('token', token);
+      storage.setItem('user', JSON.stringify(userData));
 
       setUser(userData);
       setAbilities(userAbilities);
@@ -65,8 +70,11 @@ export const AuthProvider = ({ children }) => {
       // Continue with logout even if API call fails
       console.error('Logout error:', error);
     } finally {
+      // Clear both storage types
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       setUser(null);
       setAbilities([]);
     }

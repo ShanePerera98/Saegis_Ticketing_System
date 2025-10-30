@@ -20,6 +20,7 @@ const Sidebar = ({ selectedStatus, onStatusChange, ticketCounts = {} }) => {
         ]
       : [
           'New',
+          'Acquired',
           'In Progress', 
           'Pending',
           'Resolved',
@@ -27,11 +28,6 @@ const Sidebar = ({ selectedStatus, onStatusChange, ticketCounts = {} }) => {
           'Closed',
           'Deleted'
         ];
-
-    // Add "See Others Queue" for Admin and Super Admin
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      return [...baseStatuses, 'See Others Queue'];
-    }
 
     return baseStatuses;
   };
