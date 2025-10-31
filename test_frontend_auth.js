@@ -7,7 +7,7 @@ async function testFrontendAuth() {
     console.log('🔐 Testing Frontend Authentication Flow...\n');
     
     try {
-        // Step 1: Test API login
+        // Step 1: Test API loginnpm 
         console.log('1. Testing API login...');
         const loginResponse = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',

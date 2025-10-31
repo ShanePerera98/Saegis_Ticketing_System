@@ -13,7 +13,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
     
     if (role === 'CLIENT') {
       return [
-        { label: 'Basic Troubleshoot', action: () => console.log('Basic Troubleshoot') }
+        { label: 'Basic Troubleshoot', action: () => navigate('/troubleshoot') }
       ];
     } else if (role === 'ADMIN') {
       return [
@@ -34,6 +34,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'Manage Users', action: () => navigate('/users') },
         { label: 'My Ticket History', action: () => console.log('My Ticket History') },
         { label: 'Reports & History', action: () => console.log('Reports & History') },
+        { label: 'Basic Troubleshoot', action: () => navigate('/troubleshoot') },
         { label: 'Archive', action: () => console.log('Archive') }
       ];
     }

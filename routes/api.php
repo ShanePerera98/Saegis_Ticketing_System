@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\TicketTemplateController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\TroubleshootController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +71,27 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Client operations
         Route::post('/{ticket}/client-delete', [TicketController::class, 'clientDelete']);
+        Route::delete('/{ticket}/delete', [TicketController::class, 'deleteTicket']);
+
+        // Workflow operations
+        Route::post('/{ticket}/acquire', [TicketController::class, 'acquire']);
+        Route::post('/{ticket}/progress', [TicketController::class, 'setInProgress']);
+        Route::post('/{ticket}/pause', [TicketController::class, 'pause']);
+        Route::post('/{ticket}/resume', [TicketController::class, 'resume']);
+        Route::post('/{ticket}/resolve', [TicketController::class, 'resolve']);
+        Route::post('/{ticket}/cancel', [TicketController::class, 'cancel']);
+        Route::post('/{ticket}/close', [TicketController::class, 'close']);
+        Route::post('/{ticket}/rate', [TicketController::class, 'rate']);
+    });
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread', [NotificationController::class, 'unread']);
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/{notification}/accept', [NotificationController::class, 'acceptCollaborationRequest']);
+        Route::post('/{notification}/reject', [NotificationController::class, 'rejectCollaborationRequest']);
     });
 
     // Template management
@@ -93,5 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{user}', [UserController::class, 'update']);
         Route::delete('/{user}', [UserController::class, 'destroy']);
         Route::patch('/{user}/status', [UserController::class, 'updateStatus']);
+    });
+
+    // Troubleshoot Documents routes
+    Route::prefix('troubleshoot')->group(function () {
+        Route::get('/', [TroubleshootController::class, 'index']);
+        Route::post('/', [TroubleshootController::class, 'store']);
+        Route::patch('/{document}', [TroubleshootController::class, 'update']);
+        Route::delete('/{document}', [TroubleshootController::class, 'destroy']);
+        Route::get('/{document}/download', [TroubleshootController::class, 'download'])->name('troubleshoot.download');
+        Route::get('/{document}/view', [TroubleshootController::class, 'view'])->name('troubleshoot.view');
     });
 });

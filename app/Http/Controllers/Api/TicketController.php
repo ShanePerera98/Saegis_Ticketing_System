@@ -420,4 +420,210 @@ class TicketController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    // Workflow Methods
+    public function acquire(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if (!$ticket->canBeAcquiredBy($user)) {
+            return response()->json(['message' => 'Cannot acquire this ticket'], 403);
+        }
+
+        if ($ticket->acquire($user)) {
+            return response()->json([
+                'message' => 'Ticket acquired successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Failed to acquire ticket'], 400);
+    }
+
+    public function setInProgress(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if ($ticket->setInProgress($user)) {
+            return response()->json([
+                'message' => 'Ticket set to in progress',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot set ticket to in progress'], 403);
+    }
+
+    public function pause(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->pause($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket paused successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot pause this ticket'], 403);
+    }
+
+    public function resume(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if ($ticket->resume($user)) {
+            return response()->json([
+                'message' => 'Ticket resumed successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot resume this ticket'], 403);
+    }
+
+    public function resolve(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'note' => 'nullable|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->resolve($user, $request->note)) {
+            return response()->json([
+                'message' => 'Ticket resolved successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot resolve this ticket'], 403);
+    }
+
+    public function cancel(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:200',
+            'type' => 'required|in:duplicate,irrelevant'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->cancel($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket cancelled successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot cancel this ticket'], 403);
+    }
+
+    public function close(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->close($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket closed successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot close this ticket'], 403);
+    }
+
+    public function deleteTicket(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if (!$ticket->canBeDeletedBy($user)) {
+            return response()->json(['message' => 'Cannot delete this ticket'], 403);
+        }
+
+        if ($ticket->deleteByClient($user)) {
+            return response()->json(['message' => 'Ticket deleted successfully']);
+        }
+
+        return response()->json(['message' => 'Failed to delete ticket'], 400);
+    }
+
+    public function rate(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'rating' => 'required|integer|between:1,5',
+            'feedback' => 'nullable|string|max:500'
+        ]);
+
+        $user = $request->user();
+
+        if ($user->id !== $ticket->client_id) {
+            return response()->json(['message' => 'Only the client can rate this ticket'], 403);
+        }
+
+        if ($ticket->status !== TicketStatus::RESOLVED) {
+            return response()->json(['message' => 'Can only rate resolved tickets'], 400);
+        }
+
+        $rating = $ticket->rating()->updateOrCreate(
+            ['client_id' => $user->id],
+            [
+                'rating' => $request->rating,
+                'feedback' => $request->feedback
+            ]
+        );
+
+        // Notify all participants who were involved in resolving the ticket
+        $this->notifyTicketResolvers($ticket, $rating, $user);
+
+        return response()->json([
+            'message' => 'Rating submitted successfully',
+            'rating' => $rating
+        ]);
+    }
+
+    private function notifyTicketResolvers(Ticket $ticket, $rating, User $client)
+    {
+        $resolvers = collect();
+        
+        // Add the current assignee if they exist
+        if ($ticket->current_assignee_id) {
+            $resolvers->push($ticket->current_assignee_id);
+        }
+        
+        // Add all active collaborators who participated in resolution
+        $collaboratorIds = $ticket->collaborators()
+            ->where('status', 'accepted')
+            ->whereNotNull('joined_at')
+            ->pluck('user_id');
+        
+        $resolvers = $resolvers->merge($collaboratorIds)->unique();
+        
+        // Create notifications for all resolvers
+        foreach ($resolvers as $resolverId) {
+            $ticket->notifications()->create([
+                'user_id' => $resolverId,
+                'sender_id' => $client->id,
+                'type' => 'ticket_rated',
+                'title' => 'Ticket Rated',
+                'message' => "Client {$client->name} rated ticket #{$ticket->ticket_number} with {$rating->rating} stars" . 
+                           ($rating->feedback ? ": \"{$rating->feedback}\"" : ""),
+                'data' => [
+                    'ticket_id' => $ticket->id,
+                    'rating' => $rating->rating,
+                    'feedback' => $rating->feedback,
+                    'client_name' => $client->name
+                ],
+                'status' => 'pending',
+            ]);
+        }
+    }
 }

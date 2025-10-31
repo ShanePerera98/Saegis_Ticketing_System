@@ -131,7 +131,51 @@ class TicketService
                 'changed_by' => $user->id,
                 'reason' => $reason,
             ]);
+
+            // Notify the client about status change
+            $this->notifyClientStatusChange($ticket, $oldStatus, $newStatus, $user, $reason);
         });
+    }
+
+    private function notifyClientStatusChange(Ticket $ticket, TicketStatus $oldStatus, TicketStatus $newStatus, User $changer, string $reason = null): void
+    {
+        // Don't notify if the client is the one making the change
+        if ($ticket->client_id === $changer->id) {
+            return;
+        }
+
+        $statusMessages = [
+            'NEW' => 'has been created and is awaiting assignment',
+            'ACQUIRED' => 'has been acquired by support staff',
+            'IN_PROGRESS' => 'is now being worked on',
+            'PENDING' => 'is pending additional information or external dependencies',
+            'ON_HOLD' => 'has been put on hold',
+            'RESOLVED' => 'has been resolved',
+            'CLOSED' => 'has been closed',
+            'CANCELLED_IRRELEVANT' => 'has been cancelled as irrelevant'
+        ];
+
+        $message = "Your ticket #{$ticket->ticket_number} " . ($statusMessages[$newStatus->value] ?? "status has changed to {$newStatus->value}");
+        
+        if ($reason) {
+            $message .= ". Reason: {$reason}";
+        }
+
+        $ticket->notifications()->create([
+            'user_id' => $ticket->client_id,
+            'sender_id' => $changer->id,
+            'type' => 'status_changed',
+            'title' => 'Ticket Status Updated',
+            'message' => $message,
+            'data' => [
+                'ticket_id' => $ticket->id,
+                'old_status' => $oldStatus->value,
+                'new_status' => $newStatus->value,
+                'reason' => $reason,
+                'changed_by' => $changer->name
+            ],
+            'status' => 'pending',
+        ]);
     }
 
     public function cancelAsIrrelevant(Ticket $ticket, User $user, string $reason = null): void

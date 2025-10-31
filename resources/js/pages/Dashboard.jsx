@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ticketApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import CommonHeader from '../components/CommonHeader';
@@ -10,6 +10,7 @@ import Toast from '../components/Toast';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState('New');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -46,30 +47,97 @@ const Dashboard = () => {
     setShowToast(true);
   };
 
-  const handleTicketAction = async (action, ticket, assignee = null) => {
+  const handleTicketAction = async (action, ticket, data = null) => {
     try {
       switch (action) {
         case 'get':
-          await ticketApi.assignSelf(ticket.id);
-          showToastMessage(`Ticket ${ticket.id} has been added to your queue`, 'success');
-          refetch(); // Refresh the ticket list
+        case 'acquire':
+          await ticketApi.acquire(ticket.id);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been acquired`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
           break;
+
+        case 'progress':
+          await ticketApi.setInProgress(ticket.id);
+          showToastMessage(`Ticket ${ticket.ticket_number} set to In Progress`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
+        case 'pause':
+          await ticketApi.pause(ticket.id, data?.reason);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been paused`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
+        case 'resume':
+          await ticketApi.resume(ticket.id);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been resumed`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
+        case 'resolve':
+          await ticketApi.resolve(ticket.id, data?.note);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been resolved`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
         case 'cancel':
-          setSelectedTicket(ticket);
-          setShowCancelOptions(true);
+          await ticketApi.cancel(ticket.id, data?.reason, data?.type || 'irrelevant');
+          showToastMessage(`Ticket ${ticket.ticket_number} has been cancelled`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
           break;
+
+        case 'close':
+          await ticketApi.close(ticket.id, data?.reason);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been closed`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
+        case 'delete':
+          await ticketApi.deleteTicket(ticket.id);
+          showToastMessage(`Ticket ${ticket.ticket_number} has been deleted`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
+        case 'rate':
+          await ticketApi.rate(ticket.id, data?.rating, data?.feedback);
+          showToastMessage(`Rating submitted for ticket ${ticket.ticket_number}`, 'success');
+          refetch();
+          queryClient.invalidateQueries(['notifications']);
+          break;
+
         case 'assign':
-          if (assignee) {
-            await ticketApi.assign(ticket.id, assignee);
-            showToastMessage(`Ticket ${ticket.id} has been assigned to ${assignee}`, 'success');
-            refetch(); // Refresh the ticket list
+          if (data?.assignee) {
+            await ticketApi.assign(ticket.id, data.assignee);
+            showToastMessage(`Ticket ${ticket.ticket_number} has been assigned`, 'success');
+            refetch();
+            queryClient.invalidateQueries(['notifications']);
           }
           break;
-        case 'view':
-          showToastMessage(`Viewing ticket details: ${ticket.title}`, 'info');
+
+        case 'addCollaborator':
+          if (data?.userId) {
+            await ticketApi.addCollaborator(ticket.id, data.userId);
+            showToastMessage(`Collaboration request sent for ticket ${ticket.ticket_number}`, 'success');
+            refetch();
+          }
           break;
+
+        case 'view':
+        case 'viewDetails':
+          // These are handled in the TicketCard component itself
+          break;
+
         default:
-          console.log('Unknown action:', action);
+          console.log('Unknown action:', action, ticket, data);
       }
     } catch (error) {
       showToastMessage(error.response?.data?.message || 'Action failed', 'error');

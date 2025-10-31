@@ -17,6 +17,7 @@ import Reports from './pages/Reports';
 import TemplateBuilder from './pages/TemplateBuilder';
 import UserManagement from './pages/UserManagement';
 import HeadsUpNoticeManager from './pages/HeadsUpNoticeManager';
+import TroubleshootDocuments from './pages/TroubleshootDocuments';
 import ActivityLogs from './components/ActivityLogs';
 import SystemStatus from './components/SystemStatus';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -176,6 +177,15 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <SystemStatus />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/troubleshoot"
+                  element={
+                    <ProtectedRoute>
+                      <TroubleshootDocuments />
                     </ProtectedRoute>
                   }
                 />

@@ -114,6 +114,11 @@ class User extends Authenticatable
         return $this->role->isClient();
     }
 
+    public function isSupport(): bool
+    {
+        return $this->isAdmin() || $this->isSuperAdmin();
+    }
+
     public function canManageUsers(): bool
     {
         return $this->role === UserRole::SUPER_ADMIN;

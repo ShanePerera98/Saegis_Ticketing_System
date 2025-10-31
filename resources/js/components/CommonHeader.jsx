@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LogoutModal from './LogoutModal';
+import NotificationBell from './NotificationBell';
 
 const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [notifications, setNotifications] = useState([]); // Track notifications
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
 
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
@@ -27,22 +25,6 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark');
     }
-  }, []);
-
-  // Simulate fetching notifications (replace with actual API call)
-  useEffect(() => {
-    const fetchNotifications = () => {
-      // Simulate notification count (replace with actual API call)
-      const mockNotificationCount = Math.floor(Math.random() * 10); // 0-9 notifications
-      setNotificationCount(mockNotificationCount);
-      setHasUnreadNotifications(mockNotificationCount > 0);
-    };
-
-    fetchNotifications();
-    
-    // Update notifications every 30 seconds (optional)
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   const toggleDarkMode = () => {
@@ -62,13 +44,6 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
 
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
-  };
-
-  const handleNotificationClick = () => {
-    // Handle notification click - could open a dropdown or navigate to notifications page
-    console.log('Notifications clicked');
-    // For testing: toggle notification state
-    // setHasUnreadNotifications(!hasUnreadNotifications);
   };
 
   // Navigation handler for the title
@@ -161,22 +136,8 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
             )}
           </button>
           
-          {/* Enhanced Notifications with Count */}
-          <button 
-            onClick={handleNotificationClick}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 relative transition-colors"
-            title={`Notifications ${notificationCount > 0 ? `(${notificationCount})` : ''}`}
-          >
-            <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-3.405-3.405A2.032 2.032 0 0116 12.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C5.67 6.165 4 8.388 4 11v1.159c0 .538-.214 1.055-.595 1.436L0 17h5m10 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            {/* Enhanced notification badge with count */}
-            {notificationCount > 0 && (
-              <span className="notification-badge">
-                {notificationCount > 99 ? '99+' : notificationCount}
-              </span>
-            )}
-          </button>
+          {/* Notifications */}
+          <NotificationBell />
           
           {/* Profile Icon with Dropdown */}
           <div className="relative">
