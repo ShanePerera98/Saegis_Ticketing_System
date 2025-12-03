@@ -26,6 +26,8 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'profile_image',
+        'phone',
     ];
 
     /**
@@ -112,6 +114,11 @@ class User extends Authenticatable
     public function isClient(): bool
     {
         return $this->role->isClient();
+    }
+
+    public function isSupport(): bool
+    {
+        return $this->isAdmin() || $this->isSuperAdmin();
     }
 
     public function canManageUsers(): bool

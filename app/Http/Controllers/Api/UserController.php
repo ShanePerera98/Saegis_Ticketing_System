@@ -8,6 +8,9 @@ use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -214,6 +217,67 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User status updated successfully'
         ]);
+    }
+
+    public function sendPasswordReset(Request $request, $id)
+    {
+        $user = $request->user();
+        $targetUser = User::findOrFail($id);
+
+        // Check if user can update this user (same permissions as updating)
+        if (!$this->canUpdateUser($user, $targetUser)) {
+            return response()->json(['message' => 'You cannot send password reset for this user'], 403);
+        }
+
+        try {
+            // Generate a password reset token
+            $token = Password::createToken($targetUser);
+
+            // Send the password reset notification
+            $targetUser->sendPasswordResetNotification($token);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset email sent successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send password reset email. Please check email configuration.'
+            ], 500);
+        }
+    }
+
+    public function resetPassword(Request $request, $id)
+    {
+        $user = $request->user();
+        $targetUser = User::findOrFail($id);
+
+        $request->validate([
+            'new_password' => 'required|string|min:4|confirmed',
+        ]);
+
+        // Check if user can update this user (same permissions as updating)
+        if (!$this->canUpdateUser($user, $targetUser)) {
+            return response()->json(['message' => 'You cannot reset password for this user'], 403);
+        }
+
+        try {
+            // Update the password directly
+            $targetUser->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password'
+            ], 500);
+        }
     }
 
     private function canViewUser($user, $targetUser)

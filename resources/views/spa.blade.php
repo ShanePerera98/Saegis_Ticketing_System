@@ -5,10 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         
-        <title>{{ config('app.name', 'Ticketing System') }}</title>
+        <title>Help Desk Ticketing System</title>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="/saegislogo.jpg" sizes="any">
+        <link rel="icon" href="/saegislogo.jpg" type="image/jpeg">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         @vite(['resources/css/app.css', 'resources/js/ticket-app.jsx'])
@@ -32,7 +32,17 @@
             </script>
         @endif
     </head>
-    <body>
-        <div id="ticket-app"></div>
+    <body style="background-color: #f3f4f6;">
+        <div id="ticket-app">
+            <div style="padding: 20px; text-align: center; background: white; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                <p>Loading React application...</p>
+                <p>If this message persists, check the browser console for errors.</p>
+            </div>
+        </div>
+        
+        <script>
+            console.log('SPA page loaded');
+            console.log('ticket-app element:', document.getElementById('ticket-app'));
+        </script>
     </body>
 </html>

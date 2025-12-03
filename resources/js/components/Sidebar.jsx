@@ -7,20 +7,27 @@ const Sidebar = ({ selectedStatus, onStatusChange, ticketCounts = {} }) => {
   const getStatusOptions = () => {
     const role = user?.role;
     
-    const baseStatuses = [
-      'New',
-      'In Progress', 
-      'Pending',
-      'Resolved',
-      'Canceled',
-      'Closed',
-      'Deleted'
-    ];
-
-    // Add "See Others Queue" for Admin and Super Admin
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      return [...baseStatuses, 'See Others Queue'];
-    }
+    const baseStatuses = role === 'CLIENT' 
+      ? [
+          'New',
+          'Acquired',
+          'In Progress', 
+          'Pending',
+          'Resolved',
+          'Canceled',
+          'Closed',
+          'Deleted'
+        ]
+      : [
+          'New',
+          'Acquired',
+          'In Progress', 
+          'Pending',
+          'Resolved',
+          'Canceled',
+          'Closed',
+          'Deleted'
+        ];
 
     return baseStatuses;
   };

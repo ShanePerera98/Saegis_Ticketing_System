@@ -120,7 +120,29 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Name */}
+          {/* Role - First Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Role *
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="dropdown-menu w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            >
+              {availableRoles.map(role => (
+                <option key={role.value} value={role.value} className="dropdown-option">
+                  {role.label}
+                </option>
+              ))}
+            </select>
+            {errors.role && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role}</p>
+            )}
+          </div>
+
+          {/* Full Name - Second Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Full Name *
@@ -130,7 +152,7 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors ${
                 errors.name
                   ? 'border-red-500 dark:border-red-500'
                   : 'border-gray-300 dark:border-gray-600'
@@ -142,7 +164,7 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
             )}
           </div>
 
-          {/* Email */}
+          {/* Email Address - Third Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email Address *
@@ -152,7 +174,7 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors ${
                 errors.email
                   ? 'border-red-500 dark:border-red-500'
                   : 'border-gray-300 dark:border-gray-600'
@@ -164,17 +186,17 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
             )}
           </div>
 
-          {/* Password */}
+          {/* Password - Fourth Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Password {!user && '*'}
+              Password{!user && ' *'}
             </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors ${
                 errors.password
                   ? 'border-red-500 dark:border-red-500'
                   : 'border-gray-300 dark:border-gray-600'
@@ -184,25 +206,6 @@ const UserForm = ({ user, onSubmit, onCancel, permissions }) => {
             {errors.password && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
             )}
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Role *
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-            >
-              {availableRoles.map(role => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 

@@ -57,6 +57,17 @@ class Ticket extends Model
             if (!$ticket->ticket_number) {
                 $ticket->ticket_number = self::generateTicketNumber();
             }
+            // Ensure status is never empty
+            if (is_null($ticket->status) || $ticket->status === '') {
+                $ticket->status = TicketStatus::NEW;
+            }
+        });
+
+        static::updating(function ($ticket) {
+            // Ensure status is never empty during updates
+            if (is_null($ticket->status) || $ticket->status === '') {
+                $ticket->status = TicketStatus::NEW;
+            }
         });
     }
 
@@ -129,6 +140,16 @@ class Ticket extends Model
     public function deletedTicketsLog(): HasMany
     {
         return $this->hasMany(DeletedTicketsLog::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(TicketNotification::class);
+    }
+
+    public function rating(): HasOne
+    {
+        return $this->hasOne(TicketRating::class);
     }
 
     // Query Scopes
@@ -212,19 +233,30 @@ class Ticket extends Model
     {
         $currentStatus = $this->status;
         
-        // Define valid transitions
+        // Define valid transitions for the enhanced workflow
         $validTransitions = [
             TicketStatus::NEW->value => [
-                TicketStatus::IN_PROGRESS->value,
-                TicketStatus::ON_HOLD->value,
+                TicketStatus::ACQUIRED->value,
                 TicketStatus::CANCELLED_IRRELEVANT->value,
                 TicketStatus::CANCELLED_DUPLICATE->value,
             ],
+            TicketStatus::ACQUIRED->value => [
+                TicketStatus::IN_PROGRESS->value,
+                TicketStatus::CANCELLED->value,
+                TicketStatus::CLOSED->value,
+            ],
             TicketStatus::IN_PROGRESS->value => [
+                TicketStatus::PENDING->value,
                 TicketStatus::ON_HOLD->value,
                 TicketStatus::RESOLVED->value,
-                TicketStatus::CANCELLED_IRRELEVANT->value,
-                TicketStatus::CANCELLED_DUPLICATE->value,
+                TicketStatus::CANCELLED->value,
+                TicketStatus::CLOSED->value,
+            ],
+            TicketStatus::PENDING->value => [
+                TicketStatus::IN_PROGRESS->value,
+                TicketStatus::RESOLVED->value,
+                TicketStatus::CANCELLED->value,
+                TicketStatus::CLOSED->value,
             ],
             TicketStatus::ON_HOLD->value => [
                 TicketStatus::IN_PROGRESS->value,
@@ -239,6 +271,9 @@ class Ticket extends Model
             TicketStatus::CLOSED->value => [
                 TicketStatus::IN_PROGRESS->value, // Reopen
             ],
+            TicketStatus::CANCELLED->value => [],
+            TicketStatus::CANCELLED_IRRELEVANT->value => [],
+            TicketStatus::CANCELLED_DUPLICATE->value => [],
         ];
 
         return in_array($newStatus->value, $validTransitions[$currentStatus->value] ?? []);
@@ -291,28 +326,248 @@ class Ticket extends Model
         };
     }
 
-    public function getPriorityColorAttribute(): string
-    {
-        return match ($this->priority) {
-            TicketPriority::LOW => 'green',
-            TicketPriority::MEDIUM => 'blue',
-            TicketPriority::HIGH => 'orange',
-            TicketPriority::URGENT => 'red',
-            default => 'gray',
-        };
-    }
-
     protected static function generateTicketNumber(): string
     {
         $prefix = 'TKT';
         $date = now()->format('Ymd');
         
-        $lastTicket = self::whereDate('created_at', now()->toDateString())
-                         ->orderBy('id', 'desc')
-                         ->first();
+        // Get all ticket numbers for today including soft deleted and find the highest sequence
+        $todayTickets = self::withTrashed()->where('ticket_number', 'LIKE', $prefix . '-' . $date . '-%')
+                           ->pluck('ticket_number')
+                           ->toArray();
         
-        $sequence = $lastTicket ? (int) substr($lastTicket->ticket_number, -4) + 1 : 1;
+        $maxSequence = 0;
+        foreach ($todayTickets as $ticketNumber) {
+            $parts = explode('-', $ticketNumber);
+            if (count($parts) === 3) {
+                $sequence = (int) $parts[2];
+                $maxSequence = max($maxSequence, $sequence);
+            }
+        }
         
-        return $prefix . '-' . $date . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        $newSequence = $maxSequence + 1;
+        
+        return $prefix . '-' . $date . '-' . str_pad($newSequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    // Workflow Status Validation Methods
+    public function canBeAcquiredBy(User $user): bool
+    {
+        return $this->status === TicketStatus::NEW && $user->isSupport();
+    }
+
+    public function canBeDeletedBy(User $user): bool
+    {
+        return $user->id === $this->client_id && 
+               in_array($this->status, [TicketStatus::NEW, TicketStatus::ACQUIRED, TicketStatus::IN_PROGRESS]);
+    }
+
+    // Workflow Action Methods
+    public function acquire(User $user): bool
+    {
+        if (!$this->canBeAcquiredBy($user)) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        
+        $this->update([
+            'status' => TicketStatus::ACQUIRED,
+            'current_assignee_id' => $user->id,
+        ]);
+
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::ACQUIRED, $user);
+
+        return true;
+    }
+
+    public function setInProgress(User $user): bool
+    {
+        if ($this->status !== TicketStatus::ACQUIRED || $this->current_assignee_id !== $user->id) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        $this->update(['status' => TicketStatus::IN_PROGRESS]);
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::IN_PROGRESS, $user);
+        
+        return true;
+    }
+
+    public function pause(User $user, ?string $reason = null): bool
+    {
+        if ($this->status !== TicketStatus::IN_PROGRESS || $this->current_assignee_id !== $user->id) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        
+        $this->update([
+            'status' => TicketStatus::PENDING,
+            'pause_reason' => $reason,
+        ]);
+
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::PENDING, $user, $reason);
+
+        return true;
+    }
+
+    public function resume(User $user): bool
+    {
+        if ($this->status !== TicketStatus::PENDING || $this->current_assignee_id !== $user->id) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        $this->update(['status' => TicketStatus::IN_PROGRESS]);
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::IN_PROGRESS, $user);
+        
+        return true;
+    }
+
+    public function resolve(User $user, ?string $note = null): bool
+    {
+        if (!in_array($this->status, [TicketStatus::IN_PROGRESS, TicketStatus::PENDING]) || 
+            $this->current_assignee_id !== $user->id) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        
+        $this->update([
+            'status' => TicketStatus::RESOLVED,
+            'resolution_note' => $note,
+            'resolved_at' => now(),
+            'expires_at' => now()->addDays(7), // Expires after 7 days for admin
+        ]);
+
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::RESOLVED, $user, $note);
+
+        return true;
+    }
+
+    public function cancel(User $user, string $reason): bool
+    {
+        if (!in_array($this->status, [TicketStatus::ACQUIRED, TicketStatus::IN_PROGRESS, TicketStatus::PENDING])) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        
+        $this->update([
+            'status' => TicketStatus::CANCELLED,
+            'cancel_reason' => $reason,
+            'cancelled_at' => now(),
+            'expires_at' => now()->addDays(7), // Expires after 7 days
+        ]);
+
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::CANCELLED, $user, $reason);
+
+        return true;
+    }
+
+    public function close(User $user, string $reason): bool
+    {
+        if (!in_array($this->status, [TicketStatus::ACQUIRED, TicketStatus::IN_PROGRESS, TicketStatus::PENDING])) {
+            return false;
+        }
+
+        $oldStatus = $this->status;
+        
+        $this->update([
+            'status' => TicketStatus::CLOSED,
+            'close_reason' => $reason,
+            'closed_at' => now(),
+            'expires_at' => now()->addDays(30), // Expires after 30 days for super admin
+        ]);
+
+        $this->notifyClientStatusChange($oldStatus, TicketStatus::CLOSED, $user, $reason);
+
+        return true;
+    }
+
+    public function deleteByClient(User $user): bool
+    {
+        if (!$this->canBeDeletedBy($user)) {
+            return false;
+        }
+
+        $this->delete(); // Soft delete
+        return true;
+    }
+
+    public function addCollaborator(User $collaborator, User $addedBy): bool
+    {
+        if ($this->status !== TicketStatus::IN_PROGRESS) {
+            return false;
+        }
+
+        // Create collaboration request
+        $this->collaborators()->create([
+            'user_id' => $collaborator->id,
+            'role' => $collaborator->role,
+            'added_by' => $addedBy->id,
+            'status' => 'pending',
+        ]);
+
+        // Create notification
+        $this->notifications()->create([
+            'user_id' => $collaborator->id,
+            'sender_id' => $addedBy->id,
+            'type' => 'collaboration_request',
+            'title' => 'Collaboration Request',
+            'message' => "You've been invited to collaborate on ticket #{$this->ticket_number}",
+            'data' => ['ticket_id' => $this->id],
+            'status' => 'pending',
+        ]);
+
+        return true;
+    }
+
+    public function hasExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    protected function notifyClientStatusChange(TicketStatus $oldStatus, TicketStatus $newStatus, User $changer, ?string $reason = null): void
+    {
+        // Don't notify if the client is the one making the change
+        if ($this->client_id === $changer->id) {
+            return;
+        }
+
+        $statusMessages = [
+            'NEW' => 'has been created and is awaiting assignment',
+            'ACQUIRED' => 'has been acquired by support staff',
+            'IN_PROGRESS' => 'is now being worked on',
+            'PENDING' => 'is pending additional information or external dependencies',
+            'ON_HOLD' => 'has been put on hold',
+            'RESOLVED' => 'has been resolved',
+            'CLOSED' => 'has been closed',
+            'CANCELLED' => 'has been cancelled',
+            'CANCELLED_IRRELEVANT' => 'has been cancelled as irrelevant'
+        ];
+
+        $message = "Your ticket #{$this->ticket_number} " . ($statusMessages[$newStatus->value] ?? "status has changed to {$newStatus->value}");
+        
+        if ($reason) {
+            $message .= ". Reason: {$reason}";
+        }
+
+        $this->notifications()->create([
+            'user_id' => $this->client_id,
+            'sender_id' => $changer->id,
+            'type' => 'status_changed',
+            'title' => 'Ticket Status Updated',
+            'message' => $message,
+            'data' => [
+                'ticket_id' => $this->id,
+                'old_status' => $oldStatus->value,
+                'new_status' => $newStatus->value,
+                'reason' => $reason,
+                'changed_by' => $changer->name
+            ],
+            'status' => 'pending',
+        ]);
     }
 }

@@ -5,23 +5,25 @@ namespace App\Enums;
 enum TicketStatus: string
 {
     case NEW = 'NEW';
+    case ACQUIRED = 'ACQUIRED';
     case IN_PROGRESS = 'IN_PROGRESS';
-    case ON_HOLD = 'ON_HOLD';
+    case PENDING = 'PENDING';
     case RESOLVED = 'RESOLVED';
+    case CANCELLED = 'CANCELLED';
     case CLOSED = 'CLOSED';
-    case CANCELLED_IRRELEVANT = 'CANCELLED_IRRELEVANT';
-    case CANCELLED_DUPLICATE = 'CANCELLED_DUPLICATE';
+    case DELETED = 'DELETED';
 
     public function label(): string
     {
         return match($this) {
             self::NEW => 'New',
+            self::ACQUIRED => 'Acquired',
             self::IN_PROGRESS => 'In Progress',
-            self::ON_HOLD => 'On Hold',
+            self::PENDING => 'Pending',
             self::RESOLVED => 'Resolved',
+            self::CANCELLED => 'Cancelled',
             self::CLOSED => 'Closed',
-            self::CANCELLED_IRRELEVANT => 'Cancelled (Irrelevant)',
-            self::CANCELLED_DUPLICATE => 'Cancelled (Duplicate)',
+            self::DELETED => 'Deleted',
         };
     }
 
@@ -29,23 +31,27 @@ enum TicketStatus: string
     {
         return match($this) {
             self::NEW => 'blue',
+            self::ACQUIRED => 'purple',
             self::IN_PROGRESS => 'yellow',
-            self::ON_HOLD => 'orange',
+            self::PENDING => 'orange',
             self::RESOLVED => 'green',
+            self::CANCELLED => 'red',
             self::CLOSED => 'gray',
-            self::CANCELLED_IRRELEVANT => 'red',
-            self::CANCELLED_DUPLICATE => 'red',
+            self::DELETED => 'black',
         };
     }
 
     public function canTransitionTo(TicketStatus $status): bool
     {
         return match($this) {
-            self::NEW => $status === self::IN_PROGRESS,
-            self::IN_PROGRESS => in_array($status, [self::ON_HOLD, self::RESOLVED]),
-            self::ON_HOLD => $status === self::IN_PROGRESS,
-            self::RESOLVED => in_array($status, [self::CLOSED, self::IN_PROGRESS]),
-            default => false,
+            self::NEW => in_array($status, [self::ACQUIRED, self::DELETED]),
+            self::ACQUIRED => in_array($status, [self::IN_PROGRESS, self::CANCELLED, self::CLOSED, self::DELETED]),
+            self::IN_PROGRESS => in_array($status, [self::PENDING, self::RESOLVED, self::CANCELLED, self::CLOSED, self::DELETED]),
+            self::PENDING => in_array($status, [self::IN_PROGRESS, self::CANCELLED, self::CLOSED]),
+            self::RESOLVED => false, // Resolved tickets cannot change status
+            self::CANCELLED => false, // Cancelled tickets cannot change status
+            self::CLOSED => false, // Closed tickets cannot change status
+            self::DELETED => false, // Deleted tickets cannot change status
         };
     }
 
@@ -53,18 +59,19 @@ enum TicketStatus: string
     {
         return [
             self::NEW,
+            self::ACQUIRED,
             self::IN_PROGRESS,
-            self::ON_HOLD,
-            self::RESOLVED,
-            self::CLOSED,
+            self::PENDING,
         ];
     }
 
-    public static function cancelledStates(): array
+    public static function completedStates(): array
     {
         return [
-            self::CANCELLED_IRRELEVANT,
-            self::CANCELLED_DUPLICATE,
+            self::RESOLVED,
+            self::CANCELLED,
+            self::CLOSED,
+            self::DELETED,
         ];
     }
 

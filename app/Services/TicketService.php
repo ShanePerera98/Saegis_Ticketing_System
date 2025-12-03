@@ -4,18 +4,21 @@ namespace App\Services;
 
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\TicketAttachment;
 use App\Models\DuplicateMerge;
 use App\Enums\TicketStatus;
 use App\Enums\CancelledTicketType;
 use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class TicketService
 {
-    public function createTicket(array $data, User $user): Ticket
+    public function createTicket(array $data, User $user, ?array $attachments = null): Ticket
     {
-        return DB::transaction(function () use ($data, $user) {
+        return DB::transaction(function () use ($data, $user, $attachments) {
             $ticket = Ticket::create([
                 'title' => $data['title'],
                 'description' => $data['description'],
@@ -23,7 +26,7 @@ class TicketService
                 'priority' => $data['priority'],
                 'category_id' => $data['category_id'] ?? null,
                 'template_id' => $data['template_id'] ?? null,
-                'client_id' => $user->isClient() ? $user->id : $data['client_id'],
+                'client_id' => $user->isClient() ? $user->id : ($data['client_id'] ?? $user->id),
                 'created_by' => $user->id,
                 'status' => TicketStatus::NEW,
             ]);
@@ -31,6 +34,11 @@ class TicketService
             // Store template field values if template is used
             if (isset($data['field_values']) && $ticket->template_id) {
                 $this->storeFieldValues($ticket, $data['field_values']);
+            }
+
+            // Handle file attachments
+            if ($attachments && is_array($attachments)) {
+                $this->storeAttachments($ticket, $attachments, $user);
             }
 
             // Create initial status transition
@@ -131,7 +139,51 @@ class TicketService
                 'changed_by' => $user->id,
                 'reason' => $reason,
             ]);
+
+            // Notify the client about status change
+            $this->notifyClientStatusChange($ticket, $oldStatus, $newStatus, $user, $reason);
         });
+    }
+
+    private function notifyClientStatusChange(Ticket $ticket, TicketStatus $oldStatus, TicketStatus $newStatus, User $changer, string $reason = null): void
+    {
+        // Don't notify if the client is the one making the change
+        if ($ticket->client_id === $changer->id) {
+            return;
+        }
+
+        $statusMessages = [
+            'NEW' => 'has been created and is awaiting assignment',
+            'ACQUIRED' => 'has been acquired by support staff',
+            'IN_PROGRESS' => 'is now being worked on',
+            'PENDING' => 'is pending additional information or external dependencies',
+            'ON_HOLD' => 'has been put on hold',
+            'RESOLVED' => 'has been resolved',
+            'CLOSED' => 'has been closed',
+            'CANCELLED_IRRELEVANT' => 'has been cancelled as irrelevant'
+        ];
+
+        $message = "Your ticket #{$ticket->ticket_number} " . ($statusMessages[$newStatus->value] ?? "status has changed to {$newStatus->value}");
+        
+        if ($reason) {
+            $message .= ". Reason: {$reason}";
+        }
+
+        $ticket->notifications()->create([
+            'user_id' => $ticket->client_id,
+            'sender_id' => $changer->id,
+            'type' => 'status_changed',
+            'title' => 'Ticket Status Updated',
+            'message' => $message,
+            'data' => [
+                'ticket_id' => $ticket->id,
+                'old_status' => $oldStatus->value,
+                'new_status' => $newStatus->value,
+                'reason' => $reason,
+                'changed_by' => $changer->name
+            ],
+            'status' => 'pending',
+        ]);
     }
 
     public function cancelAsIrrelevant(Ticket $ticket, User $user, string $reason = null): void
@@ -333,6 +385,29 @@ class TicketService
                 'field_id' => $fieldId,
                 'value' => json_encode($value),
             ]);
+        }
+    }
+
+    private function storeAttachments(Ticket $ticket, array $files, User $user): void
+    {
+        foreach ($files as $file) {
+            if ($file instanceof UploadedFile) {
+                // Generate unique filename
+                $filename = time() . '_' . $file->getClientOriginalName();
+                
+                // Store file in public disk under ticket-attachments directory
+                $path = $file->storeAs('ticket-attachments', $filename, 'public');
+                
+                // Create attachment record
+                TicketAttachment::create([
+                    'ticket_id' => $ticket->id,
+                    'uploaded_by' => $user->id,
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
         }
     }
 }

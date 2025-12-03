@@ -262,7 +262,7 @@ const Reports = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium">Detailed Ticket Report</h3>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto elastic-scroll scroll-shadow">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
@@ -303,7 +303,7 @@ const Reports = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        ticket.priority === 'URGENT' ? 'bg-red-100 text-red-800' :
+                        ticket.priority === 'CRITICAL' ? 'bg-red-100 text-red-800' :
                         ticket.priority === 'HIGH' ? 'bg-orange-100 text-orange-800' :
                         ticket.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-green-100 text-green-800'

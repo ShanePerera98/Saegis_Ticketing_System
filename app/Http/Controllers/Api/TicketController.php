@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketAttachment;
 use App\Models\User;
 use App\Models\DuplicateMerge;
 use App\Services\TicketService;
@@ -12,6 +13,7 @@ use App\Enums\TicketStatus;
 use App\Enums\TicketPriority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
@@ -55,6 +57,11 @@ class TicketController extends Controller
     {
         $user = $request->user();
         
+        // Handle empty priority values before validation
+        if ($request->has('priority') && (is_null($request->priority) || trim($request->priority) === '')) {
+            $request->merge(['priority' => 'MEDIUM']);
+        }
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -64,6 +71,8 @@ class TicketController extends Controller
             'client_id' => 'nullable|exists:users,id',
             'field_values' => 'nullable|array',
             'location' => 'nullable|string|max:255',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:20480', // 20MB limit per file
         ]);
 
         Gate::authorize('create', Ticket::class);
@@ -73,9 +82,9 @@ class TicketController extends Controller
             $validated['client_id'] = $user->id;
         }
 
-        $ticket = $this->ticketService->createTicket($validated, $user);
+        $ticket = $this->ticketService->createTicket($validated, $user, $request->file('attachments'));
 
-        return response()->json($ticket->load(['category', 'client', 'creator']), 201);
+        return response()->json($ticket->load(['category', 'client', 'creator', 'attachments']), 201);
     }
 
     public function show(Ticket $ticket, Request $request)
@@ -414,5 +423,246 @@ class TicketController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    // Workflow Methods
+    public function acquire(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if (!$ticket->canBeAcquiredBy($user)) {
+            return response()->json(['message' => 'Cannot acquire this ticket'], 403);
+        }
+
+        if ($ticket->acquire($user)) {
+            return response()->json([
+                'message' => 'Ticket acquired successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Failed to acquire ticket'], 400);
+    }
+
+    public function setInProgress(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if ($ticket->setInProgress($user)) {
+            return response()->json([
+                'message' => 'Ticket set to in progress',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot set ticket to in progress'], 403);
+    }
+
+    public function pause(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->pause($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket paused successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot pause this ticket'], 403);
+    }
+
+    public function resume(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if ($ticket->resume($user)) {
+            return response()->json([
+                'message' => 'Ticket resumed successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot resume this ticket'], 403);
+    }
+
+    public function resolve(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'note' => 'nullable|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->resolve($user, $request->note)) {
+            return response()->json([
+                'message' => 'Ticket resolved successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot resolve this ticket'], 403);
+    }
+
+    public function cancel(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:200',
+            'type' => 'required|in:duplicate,irrelevant'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->cancel($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket cancelled successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot cancel this ticket'], 403);
+    }
+
+    public function close(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:200'
+        ]);
+
+        $user = $request->user();
+
+        if ($ticket->close($user, $request->reason)) {
+            return response()->json([
+                'message' => 'Ticket closed successfully',
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+            ]);
+        }
+
+        return response()->json(['message' => 'Cannot close this ticket'], 403);
+    }
+
+    public function deleteTicket(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        if (!$ticket->canBeDeletedBy($user)) {
+            return response()->json(['message' => 'Cannot delete this ticket'], 403);
+        }
+
+        if ($ticket->deleteByClient($user)) {
+            return response()->json(['message' => 'Ticket deleted successfully']);
+        }
+
+        return response()->json(['message' => 'Failed to delete ticket'], 400);
+    }
+
+    public function rate(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'rating' => 'required|integer|between:1,5',
+            'feedback' => 'nullable|string|max:500'
+        ]);
+
+        $user = $request->user();
+
+        if ($user->id !== $ticket->client_id) {
+            return response()->json(['message' => 'Only the client can rate this ticket'], 403);
+        }
+
+        if ($ticket->status !== TicketStatus::RESOLVED) {
+            return response()->json(['message' => 'Can only rate resolved tickets'], 400);
+        }
+
+        $rating = $ticket->rating()->updateOrCreate(
+            ['client_id' => $user->id],
+            [
+                'rating' => $request->rating,
+                'feedback' => $request->feedback
+            ]
+        );
+
+        // Notify all participants who were involved in resolving the ticket
+        $this->notifyTicketResolvers($ticket, $rating, $user);
+
+        return response()->json([
+            'message' => 'Rating submitted successfully',
+            'rating' => $rating
+        ]);
+    }
+
+    private function notifyTicketResolvers(Ticket $ticket, $rating, User $client)
+    {
+        $resolvers = collect();
+        
+        // Add the current assignee if they exist
+        if ($ticket->current_assignee_id) {
+            $resolvers->push($ticket->current_assignee_id);
+        }
+        
+        // Add all active collaborators who participated in resolution
+        $collaboratorIds = $ticket->collaborators()
+            ->where('status', 'accepted')
+            ->whereNotNull('joined_at')
+            ->pluck('user_id');
+        
+        $resolvers = $resolvers->merge($collaboratorIds)->unique();
+        
+        // Create notifications for all resolvers
+        foreach ($resolvers as $resolverId) {
+            $ticket->notifications()->create([
+                'user_id' => $resolverId,
+                'sender_id' => $client->id,
+                'type' => 'ticket_rated',
+                'title' => 'Ticket Rated',
+                'message' => "Client {$client->name} rated ticket #{$ticket->ticket_number} with {$rating->rating} stars" . 
+                           ($rating->feedback ? ": \"{$rating->feedback}\"" : ""),
+                'data' => [
+                    'ticket_id' => $ticket->id,
+                    'rating' => $rating->rating,
+                    'feedback' => $rating->feedback,
+                    'client_name' => $client->name
+                ],
+                'status' => 'pending',
+            ]);
+        }
+    }
+
+    public function downloadAttachment(Ticket $ticket, TicketAttachment $attachment)
+    {
+        // Ensure the attachment belongs to this ticket
+        if ($attachment->ticket_id !== $ticket->id) {
+            return response()->json(['message' => 'Attachment not found'], 404);
+        }
+
+        // Check if file exists using Storage facade
+        if (!Storage::disk('public')->exists($attachment->path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
+        return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+    }
+
+    public function viewAttachment(Ticket $ticket, TicketAttachment $attachment)
+    {
+        // Ensure the attachment belongs to this ticket
+        if ($attachment->ticket_id !== $ticket->id) {
+            return response()->json(['message' => 'Attachment not found'], 404);
+        }
+
+        // Check if file exists using Storage facade
+        if (!Storage::disk('public')->exists($attachment->path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
+        $filePath = Storage::disk('public')->path($attachment->path);
+
+        return response()->file($filePath, [
+            'Content-Type' => $attachment->mime_type,
+            'Content-Disposition' => 'inline; filename="' . $attachment->original_name . '"'
+        ]);
     }
 }

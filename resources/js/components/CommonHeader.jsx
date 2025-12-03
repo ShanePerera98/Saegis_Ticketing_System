@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import LogoutModal from './LogoutModal';
+import NotificationBell from './NotificationBell';
 
 const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [notifications, setNotifications] = useState([]); // Track notifications
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
@@ -24,23 +25,6 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark');
     }
-  }, []);
-
-  // Simulate fetching notifications (replace with actual API call)
-  useEffect(() => {
-    // For now, we'll assume no notifications
-    // You can replace this with actual notification fetching logic
-    const fetchNotifications = () => {
-      // Example: const response = await notificationApi.getUnread();
-      // setNotifications(response.data);
-      // setHasUnreadNotifications(response.data.length > 0);
-      
-      // For now, set to false (no notifications)
-      setNotifications([]);
-      setHasUnreadNotifications(false);
-    };
-
-    fetchNotifications();
   }, []);
 
   const toggleDarkMode = () => {
@@ -62,13 +46,6 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
     setShowProfileDropdown(!showProfileDropdown);
   };
 
-  const handleNotificationClick = () => {
-    // Handle notification click - could open a dropdown or navigate to notifications page
-    console.log('Notifications clicked');
-    // For testing: toggle notification state
-    // setHasUnreadNotifications(!hasUnreadNotifications);
-  };
-
   // Navigation handler for the title
   const handleTitleClick = () => {
     const role = user?.role;
@@ -83,8 +60,23 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
     }
   };
 
+  // Logout handlers
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+    setShowProfileDropdown(false);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 relative z-10">
       <div className="flex items-center justify-between px-6 py-4">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
@@ -103,7 +95,7 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           {/* Company Logo and Name */}
           <div className="flex items-center space-x-2">
             <img 
-              src="/logo.svg" 
+              src="/saegislogo.jpg" 
               alt="Saegis Logo" 
               className="w-8 h-8"
               onError={(e) => {
@@ -114,13 +106,13 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           </div>
         </div>
         
-        {/* Center Section - App Name */}
+        {/* Center Section - App Name - Enhanced Size */}
         <div 
-          className="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-full transition-colors cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-500"
+          className="bg-gray-200 dark:bg-gray-600 px-18 py-3 rounded-full transition-colors cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-500"
           onClick={handleTitleClick}
           title="Go to Home"
         >
-          <h1 className="text-lg font-medium text-gray-700 dark:text-gray-200 transition-colors">Saegis Help Desk</h1>
+          <h1 className="text-xl font-semibold text-gray-700 dark:text-gray-200 transition-colors">Saegis Help Desk</h1>
         </div>
         
         {/* Right Section - Icons */}
@@ -145,19 +137,7 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           </button>
           
           {/* Notifications */}
-          <button 
-            onClick={handleNotificationClick}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 relative transition-colors"
-            title="Notifications"
-          >
-            <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-3.405-3.405A2.032 2.032 0 0116 12.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C5.67 6.165 4 8.388 4 11v1.159c0 .538-.214 1.055-.595 1.436L0 17h5m10 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            {/* Notification badge - only show when there are unread notifications */}
-            {hasUnreadNotifications && (
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
-            )}
-          </button>
+          <NotificationBell />
           
           {/* Profile Icon with Dropdown */}
           <div className="relative">
@@ -171,20 +151,38 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
               </svg>
             </button>
             
-            {/* User info and logout dropdown */}
+            {/* Enhanced Profile Dropdown */}
             {showProfileDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 z-50 transition-colors">
-                <div className="py-2 px-4 border-b border-gray-200 dark:border-gray-600">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+              <div className="dropdown-menu absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50 transition-colors">
+                {/* User Name */}
+                <div className="dropdown-option px-4 py-3 border-b border-gray-200 dark:border-gray-600">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user?.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">{user?.role}</p>
                 </div>
+                
+                {/* Manage Profile */}
                 <button
                   onClick={() => {
-                    logout();
+                    navigate('/profile');
                     setShowProfileDropdown(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  className="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Manage Profile
+                </button>
+                
+                {/* Logout */}
+                <button
+                  onClick={handleLogoutClick}
+                  className="dropdown-option w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
                   Logout
                 </button>
               </div>
@@ -200,6 +198,13 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           onClick={() => setShowProfileDropdown(false)}
         ></div>
       )}
+      
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </header>
   );
 };

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,7 +26,7 @@ const Login = () => {
     setError('');
 
     try {
-      const user = await login({ email, password });
+      const user = await login({ email, password, remember: rememberMe });
       
       // Redirect to the SPA tickets entry; SPA will further route based on role
       navigate('/tickets');
@@ -46,7 +47,7 @@ const Login = () => {
         <div>
           <div className="flex justify-center mb-6">
             <img 
-              src="/saegis-logo.svg" 
+              src="/saegislogo.jpg" 
               alt="Saegis Campus" 
               className="h-16 w-auto"
             />
@@ -102,6 +103,22 @@ const Login = () => {
                   </svg>
                 )}
               </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                Remember me
+              </label>
             </div>
           </div>
 

@@ -6,6 +6,11 @@ import AdminNavigation from '../components/AdminNavigation';
 
 const TemplateBuilder = () => {
   const { user } = useAuth();
+  
+  // Debug authentication first
+  console.log('🔍 TemplateBuilder - User:', user);
+  console.log('🔍 TemplateBuilder - Token:', localStorage.getItem('token') || sessionStorage.getItem('token'));
+  
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
@@ -27,15 +32,30 @@ const TemplateBuilder = () => {
     order: 0,
   });
 
-  const { data: templates } = useQuery({
+  const { data: templates, isLoading: templatesLoading, error: templatesError } = useQuery({
     queryKey: ['ticket-templates'],
-    queryFn: () => ticketApi.getTemplates(),
+    queryFn: () => {
+      console.log('🔍 Making templates API call...');
+      console.log('🔍 User:', user);
+      console.log('🔍 Token in localStorage:', localStorage.getItem('token'));
+      console.log('🔍 Token in sessionStorage:', sessionStorage.getItem('token'));
+      return ticketApi.getTemplates();
+    },
     enabled: !!user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'),
+    retry: 3,
+    onError: (error) => {
+      console.error('❌ Templates query error:', error);
+      console.error('❌ Error response:', error.response);
+    }
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useQuery({
     queryKey: ['categories'],
     queryFn: () => ticketApi.getCategories(),
+    retry: 3,
+    onError: (error) => {
+      console.error('Categories query error:', error);
+    }
   });
 
   const createTemplateMutation = useMutation({
@@ -196,9 +216,35 @@ const TemplateBuilder = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Display */}
+        {(templatesError || categoriesError) && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div className="flex">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Error Loading Data
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  {templatesError && <p>Templates: {templatesError.message}</p>}
+                  {categoriesError && <p>Categories: {categoriesError.message}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {(templatesLoading || categoriesLoading) && (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-2 text-gray-600">Loading templates...</p>
+          </div>
+        )}
+
         {/* Templates List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates?.data?.map((template) => (
+        {!templatesLoading && !templatesError && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(templates?.data || templates)?.map((template) => (
             <div key={template.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -233,7 +279,8 @@ const TemplateBuilder = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Template Form Modal */}
         {showForm && (
