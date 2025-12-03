@@ -400,7 +400,7 @@ const TicketCard = ({ ticket, onAction }) => {
 
       {/* Modal for input dialogs */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
+        <div className="fixed inset-0 blur-overlay flex items-center justify-center z-50" onClick={closeModal}>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96 max-w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
               {modalType === 'cancel' && 'Cancel Ticket'}
@@ -487,7 +487,7 @@ const TicketCard = ({ ticket, onAction }) => {
 
       {/* Detailed View Modal */}
       {showDetailedView && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDetailedView(false)}>
+        <div className="fixed inset-0 blur-overlay flex items-center justify-center z-50" onClick={() => setShowDetailedView(false)}>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">

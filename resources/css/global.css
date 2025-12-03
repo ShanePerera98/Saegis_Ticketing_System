@@ -501,6 +501,30 @@ textarea,
   }
 }
 
+/* Blur overlay styles - replaces black backgrounds */
+.blur-overlay {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.dark .blur-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Hamburger menu blur overlay */
+.hamburger-blur-overlay {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+
+.dark .hamburger-blur-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 /* Ticket priority borders */
 .priority-high {
   border: 3px solid #ff7900;

@@ -48,7 +48,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
     <>
       {/* Overlay - only cover the right side content area */}
       <div 
-        className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-30 z-30 transition-all duration-300"
+        className="fixed top-0 right-0 bottom-0 hamburger-blur-overlay z-30 transition-all duration-300"
         style={{ left: '320px' }}
         onClick={onClose}
       ></div>

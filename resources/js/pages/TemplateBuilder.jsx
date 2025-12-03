@@ -284,7 +284,7 @@ const TemplateBuilder = () => {
 
         {/* Template Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 blur-overlay flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-full overflow-y-auto">
               <form onSubmit={handleSubmit} className="p-6">
                 <h3 className="text-lg font-medium mb-6">

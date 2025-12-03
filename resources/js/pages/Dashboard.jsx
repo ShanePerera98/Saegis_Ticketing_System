@@ -255,7 +255,7 @@ const Dashboard = () => {
 
       {/* Cancel Options Modal */}
       {showCancelOptions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 blur-overlay flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 transition-colors">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white transition-colors">Cancel Ticket</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6 transition-colors">

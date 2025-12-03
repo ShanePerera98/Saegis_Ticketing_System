@@ -69,7 +69,7 @@ const PasswordResetModal = ({ user, onSubmit, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 blur-overlay flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Reset Password for {user.name}
