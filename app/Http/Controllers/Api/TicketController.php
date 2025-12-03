@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketAttachment;
 use App\Models\User;
 use App\Models\DuplicateMerge;
 use App\Services\TicketService;
@@ -12,6 +13,7 @@ use App\Enums\TicketStatus;
 use App\Enums\TicketPriority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
@@ -69,6 +71,8 @@ class TicketController extends Controller
             'client_id' => 'nullable|exists:users,id',
             'field_values' => 'nullable|array',
             'location' => 'nullable|string|max:255',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:20480', // 20MB limit per file
         ]);
 
         Gate::authorize('create', Ticket::class);
@@ -78,9 +82,9 @@ class TicketController extends Controller
             $validated['client_id'] = $user->id;
         }
 
-        $ticket = $this->ticketService->createTicket($validated, $user);
+        $ticket = $this->ticketService->createTicket($validated, $user, $request->file('attachments'));
 
-        return response()->json($ticket->load(['category', 'client', 'creator']), 201);
+        return response()->json($ticket->load(['category', 'client', 'creator', 'attachments']), 201);
     }
 
     public function show(Ticket $ticket, Request $request)
@@ -625,5 +629,40 @@ class TicketController extends Controller
                 'status' => 'pending',
             ]);
         }
+    }
+
+    public function downloadAttachment(Ticket $ticket, TicketAttachment $attachment)
+    {
+        // Ensure the attachment belongs to this ticket
+        if ($attachment->ticket_id !== $ticket->id) {
+            return response()->json(['message' => 'Attachment not found'], 404);
+        }
+
+        // Check if file exists using Storage facade
+        if (!Storage::disk('public')->exists($attachment->path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
+        return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+    }
+
+    public function viewAttachment(Ticket $ticket, TicketAttachment $attachment)
+    {
+        // Ensure the attachment belongs to this ticket
+        if ($attachment->ticket_id !== $ticket->id) {
+            return response()->json(['message' => 'Attachment not found'], 404);
+        }
+
+        // Check if file exists using Storage facade
+        if (!Storage::disk('public')->exists($attachment->path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
+        $filePath = Storage::disk('public')->path($attachment->path);
+
+        return response()->file($filePath, [
+            'Content-Type' => $attachment->mime_type,
+            'Content-Disposition' => 'inline; filename="' . $attachment->original_name . '"'
+        ]);
     }
 }

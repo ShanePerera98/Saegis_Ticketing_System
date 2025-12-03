@@ -30,30 +30,18 @@ class TroubleshootController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        try {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'file' => [
-                    'required',
-                    File::types(['pdf'])
-                        ->min(1024) // 1KB minimum
-                        ->max(100 * 1024), // 100MB maximum
-                ],
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        }
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'file' => [
+                'required',
+                File::types(['pdf'])
+                    ->min(1024) // 1KB minimum
+                    ->max(100 * 1024), // 100MB maximum
+            ],
+        ]);
 
         $file = $request->file('file');
-        
-        if (!$file) {
-            return response()->json(['message' => 'No file uploaded'], 400);
-        }
-
         $filename = Str::uuid() . '.pdf';
         $path = $file->storeAs('troubleshoot-documents', $filename, 'public');
 
@@ -121,12 +109,13 @@ class TroubleshootController extends Controller
             return response()->json(['message' => 'Document not found'], 404);
         }
 
-        // Check if file exists using Storage facade
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
             return response()->json(['message' => 'File not found'], 404);
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->original_filename);
+        return response()->download($filePath, $document->original_filename);
     }
 
     public function view(TroubleshootDocument $document)
@@ -135,12 +124,11 @@ class TroubleshootController extends Controller
             return response()->json(['message' => 'Document not found'], 404);
         }
 
-        // Check if file exists using Storage facade
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
             return response()->json(['message' => 'File not found'], 404);
         }
-
-        $filePath = Storage::disk('public')->path($document->file_path);
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',

@@ -414,7 +414,7 @@ download.head = (args: { document: number | { id: number } } | [document: number
     download.form = downloadForm
 /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
 export const view = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -429,7 +429,7 @@ view.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
 view.url = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -462,7 +462,7 @@ view.url = (args: { document: number | { id: number } } | [document: number | { 
 
 /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
 view.get = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -471,7 +471,7 @@ view.get = (args: { document: number | { id: number } } | [document: number | { 
 })
 /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
 view.head = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -481,7 +481,7 @@ view.head = (args: { document: number | { id: number } } | [document: number | {
 
     /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
     const viewForm = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -491,7 +491,7 @@ view.head = (args: { document: number | { id: number } } | [document: number | {
 
             /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
         viewForm.get = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -500,7 +500,7 @@ view.head = (args: { document: number | { id: number } } | [document: number | {
         })
             /**
 * @see \App\Http\Controllers\Api\TroubleshootController::view
- * @see app/Http/Controllers/Api/TroubleshootController.php:133
+ * @see app/Http/Controllers/Api/TroubleshootController.php:132
  * @route '/api/troubleshoot/{document}/view'
  */
         viewForm.head = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

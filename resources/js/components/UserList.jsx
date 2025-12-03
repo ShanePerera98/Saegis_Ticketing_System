@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-const UserList = ({ users, permissions, onEdit, onDelete }) => {
+const UserList = ({ users, permissions, onEdit, onDelete, onSendPasswordReset, onResetPassword }) => {
   const { user: currentUser } = useAuth();
 
   const getRoleBadgeColor = (role) => {
@@ -55,6 +55,16 @@ const UserList = ({ users, permissions, onEdit, onDelete }) => {
       return permissions.canDeleteClient;
     }
     return false;
+  };
+
+  const canResetPassword = (userToReset) => {
+    // Prevent resetting own password through admin panel (use profile instead)
+    if (userToReset.id === currentUser.id) {
+      return false;
+    }
+
+    // Same permissions as editing user
+    return canEditUser(userToReset);
   };
 
   const formatDate = (dateString) => {
@@ -169,6 +179,32 @@ const UserList = ({ users, permissions, onEdit, onDelete }) => {
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Send Password Reset Email Button - Based on permissions */}
+                    {canResetPassword(user) && (
+                      <button
+                        onClick={() => onSendPasswordReset(user.id)}
+                        className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors"
+                        title="Send Password Reset Email"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 3.26a2 2 0 001.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Reset Password Button - Based on permissions */}
+                    {canResetPassword(user) && (
+                      <button
+                        onClick={() => onResetPassword(user)}
+                        className="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300 transition-colors"
+                        title="Reset Password"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                         </svg>
                       </button>
                     )}

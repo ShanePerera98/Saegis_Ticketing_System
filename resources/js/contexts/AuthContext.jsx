@@ -100,12 +100,25 @@ export const AuthProvider = ({ children }) => {
     return user?.role === 'CLIENT';
   };
 
+  const updateUser = (updatedUserData) => {
+    const newUser = { ...user, ...updatedUserData };
+    setUser(newUser);
+    
+    // Update storage with new user data
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+      storage.setItem('user', JSON.stringify(newUser));
+    }
+  };
+
   const value = {
     user,
     abilities,
     loading,
     login,
     logout,
+    updateUser,
     hasAbility,
     isRole,
     isAdmin,

@@ -4,18 +4,21 @@ namespace App\Services;
 
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\TicketAttachment;
 use App\Models\DuplicateMerge;
 use App\Enums\TicketStatus;
 use App\Enums\CancelledTicketType;
 use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class TicketService
 {
-    public function createTicket(array $data, User $user): Ticket
+    public function createTicket(array $data, User $user, ?array $attachments = null): Ticket
     {
-        return DB::transaction(function () use ($data, $user) {
+        return DB::transaction(function () use ($data, $user, $attachments) {
             $ticket = Ticket::create([
                 'title' => $data['title'],
                 'description' => $data['description'],
@@ -31,6 +34,11 @@ class TicketService
             // Store template field values if template is used
             if (isset($data['field_values']) && $ticket->template_id) {
                 $this->storeFieldValues($ticket, $data['field_values']);
+            }
+
+            // Handle file attachments
+            if ($attachments && is_array($attachments)) {
+                $this->storeAttachments($ticket, $attachments, $user);
             }
 
             // Create initial status transition
@@ -377,6 +385,29 @@ class TicketService
                 'field_id' => $fieldId,
                 'value' => json_encode($value),
             ]);
+        }
+    }
+
+    private function storeAttachments(Ticket $ticket, array $files, User $user): void
+    {
+        foreach ($files as $file) {
+            if ($file instanceof UploadedFile) {
+                // Generate unique filename
+                $filename = time() . '_' . $file->getClientOriginalName();
+                
+                // Store file in public disk under ticket-attachments directory
+                $path = $file->storeAs('ticket-attachments', $filename, 'public');
+                
+                // Create attachment record
+                TicketAttachment::create([
+                    'ticket_id' => $ticket->id,
+                    'uploaded_by' => $user->id,
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
         }
     }
 }

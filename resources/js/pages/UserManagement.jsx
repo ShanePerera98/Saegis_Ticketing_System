@@ -9,6 +9,146 @@ import UserForm from '../components/UserForm';
 import UserList from '../components/UserList';
 import { userApi } from '../services/api';
 
+// Password Reset Modal Component
+const PasswordResetModal = ({ user, onSubmit, onCancel }) => {
+  const [formData, setFormData] = useState({
+    new_password: '',
+    new_password_confirmation: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear errors when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.new_password) {
+      newErrors.new_password = 'New password is required';
+    } else if (formData.new_password.length < 4) {
+      newErrors.new_password = 'Password must be at least 4 characters';
+    }
+    
+    if (!formData.new_password_confirmation) {
+      newErrors.new_password_confirmation = 'Please confirm the password';
+    } else if (formData.new_password !== formData.new_password_confirmation) {
+      newErrors.new_password_confirmation = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          Reset Password for {user.name}
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Enter a new password for this user. They will be able to use this password immediately.
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* New Password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              New Password
+            </label>
+            <input
+              type="password"
+              name="new_password"
+              value={formData.new_password}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 ${
+                errors.new_password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
+              placeholder="Enter new password"
+            />
+            {errors.new_password && (
+              <p className="text-red-500 text-sm mt-1">{errors.new_password}</p>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              name="new_password_confirmation"
+              value={formData.new_password_confirmation}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 ${
+                errors.new_password_confirmation ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
+              placeholder="Confirm new password"
+            />
+            {errors.new_password_confirmation && (
+              <p className="text-red-500 text-sm mt-1">{errors.new_password_confirmation}</p>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isSubmitting}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {isSubmitting && (
+                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              Reset Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const UserManagement = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -20,6 +160,8 @@ const UserManagement = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState(null);
 
   // Fetch users based on role filter
   const { data: allUsers = [], isLoading, error, refetch } = useQuery({
@@ -102,6 +244,38 @@ const UserManagement = () => {
   const handleFormCancel = () => {
     setShowForm(false);
     setEditingUser(null);
+  };
+
+  const handleSendPasswordReset = async (userId) => {
+    if (window.confirm('Are you sure you want to send a password reset email to this user?')) {
+      try {
+        await userApi.sendPasswordReset(userId);
+        showToastMessage('Password reset email sent successfully', 'success');
+      } catch (error) {
+        showToastMessage(error.response?.data?.message || 'Failed to send password reset email', 'error');
+      }
+    }
+  };
+
+  const handleResetPassword = (user) => {
+    setResetPasswordUser(user);
+    setShowPasswordResetModal(true);
+  };
+
+  const handlePasswordResetSubmit = async (passwordData) => {
+    try {
+      await userApi.resetPassword(resetPasswordUser.id, passwordData);
+      showToastMessage('Password reset successfully', 'success');
+      setShowPasswordResetModal(false);
+      setResetPasswordUser(null);
+    } catch (error) {
+      showToastMessage(error.response?.data?.message || 'Failed to reset password', 'error');
+    }
+  };
+
+  const handlePasswordResetCancel = () => {
+    setShowPasswordResetModal(false);
+    setResetPasswordUser(null);
   };
 
   // Define permissions based on user role
@@ -191,7 +365,7 @@ const UserManagement = () => {
                       className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="all">All Roles</option>
-                      <option value="SUPER_ADMIN">Super Admin</option>
+                      {user.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">Super Admin</option>}
                       <option value="ADMIN">Admin</option>
                       <option value="CLIENT">Client</option>
                     </select>
@@ -243,7 +417,18 @@ const UserManagement = () => {
               permissions={permissions}
               onEdit={handleEditUser}
               onDelete={handleDeleteUser}
+              onSendPasswordReset={handleSendPasswordReset}
+              onResetPassword={handleResetPassword}
             />
+
+            {/* Password Reset Modal */}
+            {showPasswordResetModal && resetPasswordUser && (
+              <PasswordResetModal
+                user={resetPasswordUser}
+                onSubmit={handlePasswordResetSubmit}
+                onCancel={handlePasswordResetCancel}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -9,13 +9,13 @@ import './utils/elasticScroll.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import ClientTickets from './pages/ClientTickets';
+import ClientTickets from './pages/ClientTickets_test';
 import TicketDetails from './pages/TicketDetails';
 import CancelledTickets from './pages/CancelledTickets';
 import MergeCenter from './pages/MergeCenter';
 import Reports from './pages/Reports';
-import TemplateBuilder from './pages/TemplateBuilder';
 import UserManagement from './pages/UserManagement';
+import ProfileManagement from './pages/ProfileManagement_new';
 import HeadsUpNoticeManager from './pages/HeadsUpNoticeManager';
 import TroubleshootDocuments from './pages/TroubleshootDocuments';
 import ActivityLogs from './components/ActivityLogs';
@@ -137,15 +137,6 @@ const App = () => {
                 />
                 
                 <Route
-                  path="/templates"
-                  element={
-                    <ProtectedRoute>
-                      <TemplateBuilder />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
                   path="/activity-logs"
                   element={
                     <ProtectedRoute>
@@ -159,6 +150,15 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfileManagement />
                     </ProtectedRoute>
                   }
                 />
@@ -228,9 +228,22 @@ const App = () => {
 };
 
 // Render the app
+console.log('Script loaded, starting React app...');
+
 const container = document.getElementById('ticket-app');
+console.log('Looking for ticket-app element...');
+console.log('Container found:', container);
+
 if (container) {
-  const root = createRoot(container);
-  console.log('Ticket-app mounting...');
-  root.render(<App />);
+  try {
+    const root = createRoot(container);
+    console.log('Ticket-app mounting...');
+    root.render(<App />);
+    console.log('React app rendered successfully');
+  } catch (error) {
+    console.error('Error rendering React app:', error);
+    container.innerHTML = `<div style="color: red; padding: 20px;">Error: ${error.message}</div>`;
+  }
+} else {
+  console.error('Could not find ticket-app element!');
 }

@@ -19,7 +19,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
       return [
         { label: 'See Others Queue', action: () => console.log('See Others Queue') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
-        { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
+        { label: 'Configure Ticket Template', action: () => {} },
         { label: 'Manage Users', action: () => navigate('/users') },
         { label: 'My Ticket History', action: () => console.log('My Ticket History') }
       ];
@@ -29,7 +29,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
         { label: 'Cancelled Tickets', action: () => console.log('Cancelled Tickets') },
         { label: 'Closed Tickets', action: () => console.log('Closed Tickets') },
         { label: 'Duplicate Tickets', action: () => console.log('Duplicate Tickets') },
-        { label: 'Configure Ticket Template', action: () => console.log('Configure Ticket Template') },
+        { label: 'Configure Ticket Template', action: () => {} },
         { label: 'Heads Up Notice', action: () => navigate('/headsup-notice') },
         { label: 'Manage Users', action: () => navigate('/users') },
         { label: 'My Ticket History', action: () => console.log('My Ticket History') },

@@ -76,7 +76,7 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 relative z-10">
       <div className="flex items-center justify-between px-6 py-4">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
@@ -163,8 +163,7 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
                 {/* Manage Profile */}
                 <button
                   onClick={() => {
-                    // Navigate to profile management (implement as needed)
-                    console.log('Navigate to profile management');
+                    navigate('/profile');
                     setShowProfileDropdown(false);
                   }}
                   className="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"

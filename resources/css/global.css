@@ -1,5 +1,28 @@
 /* Global UI Improvements */
 
+/* Development error overlay fixes */
+#vite-error-overlay,
+.vite-error-overlay,
+[data-vite-error-overlay],
+.error-overlay {
+  z-index: 999999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure error messages appear above header */
+.error-message,
+.syntax-error,
+.module-error,
+[class*="error"] {
+  z-index: 99999 !important;
+  position: relative !important;
+}
+
 /* Enhanced elastic scrolling with bounce effects */
 html {
   scroll-behavior: smooth;

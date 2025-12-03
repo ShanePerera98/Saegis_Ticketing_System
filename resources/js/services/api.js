@@ -76,7 +76,19 @@ export const authApi = {
 export const ticketApi = {
   list: (params = {}) => api.get('/tickets', { params }),
   get: (id) => api.get(`/tickets/${id}`),
-  create: (data) => api.post('/tickets', data),
+  create: (data) => {
+    // If data is FormData, handle it with proper headers
+    if (data instanceof FormData) {
+      return api.post('/tickets', data, {
+        headers: {
+          // Let browser set Content-Type with boundary for FormData
+        },
+        timeout: 300000, // 5 minutes for file uploads
+      });
+    }
+    // Regular JSON data
+    return api.post('/tickets', data);
+  },
   update: (id, data) => api.patch(`/tickets/${id}`, data),
   assignSelf: (id) => api.post(`/tickets/${id}/assign/self`),
   assign: (id, assigneeId) => api.post(`/tickets/${id}/assign`, { assignee_id: assigneeId }),
@@ -142,6 +154,17 @@ export const userApi = {
   update: (id, data) => api.patch(`/users/${id}`, data),
   delete: (id) => api.delete(`/users/${id}`),
   updateStatus: (id, is_active) => api.patch(`/users/${id}/status`, { is_active }),
+  sendPasswordReset: (id) => api.post(`/users/${id}/send-password-reset`),
+  resetPassword: (id, data) => api.patch(`/users/${id}/reset-password`, data),
+};
+
+export const profileApi = {
+  show: () => api.get('/profile'),
+  update: (data) => api.patch('/profile', data),
+  updatePassword: (data) => api.patch('/profile/password', data),
+  sendPasswordResetEmail: () => api.post('/profile/password-reset-email'),
+  updateImage: (data) => api.post('/profile/image', data),
+  deleteImage: () => api.delete('/profile/image'),
 };
 
 export const troubleshootApi = {
