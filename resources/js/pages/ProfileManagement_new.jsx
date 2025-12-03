@@ -9,7 +9,7 @@ import { profileApi } from '../services/api';
 const ProfileManagement = () => {
   const { user, updateUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('security');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -109,10 +109,24 @@ const ProfileManagement = () => {
 
     try {
       const response = await profileApi.updateImage(formData);
-      setImagePreview(response.data.data.profile_image);
+      console.log('Upload response:', response.data); // Debug log
+      
+      const profileImageUrl = response.data.data.profile_image;
+      setImagePreview(profileImageUrl);
       showToastMessage('Profile image updated successfully', 'success');
-      const updatedUser = { ...user, profile_image: response.data.data.profile_image };
+      
+      // Update user context with new image
+      const updatedUser = { 
+        ...user, 
+        profile_image: profileImageUrl 
+      };
       updateUser(updatedUser);
+      
+      // Clear the file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       showToastMessage(error.response?.data?.message || 'Failed to upload image', 'error');
@@ -212,16 +226,6 @@ const ProfileManagement = () => {
               <div className="border-b border-gray-200 dark:border-gray-700">
                 <nav className="flex space-x-8 px-6">
                   <button
-                    onClick={() => setActiveTab('profile')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === 'profile'
-                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                    }`}
-                  >
-                    Profile Information
-                  </button>
-                  <button
                     onClick={() => setActiveTab('security')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeTab === 'security'
@@ -246,60 +250,6 @@ const ProfileManagement = () => {
 
               {/* Tab Content */}
               <div className="p-6">
-                {/* Profile Information Tab */}
-                {activeTab === 'profile' && (
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                      Profile Information
-                    </h2>
-                    <form onSubmit={handleProfileSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          value={profileData.name}
-                          onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          value={profileData.email}
-                          onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          value={profileData.phone}
-                          onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                          placeholder="Optional"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors duration-200 disabled:opacity-50"
-                      >
-                        {loading ? 'Updating...' : 'Update Profile'}
-                      </button>
-                    </form>
-                  </div>
-                )}
-
                 {/* Security Settings Tab */}
                 {activeTab === 'security' && (
                   <div>

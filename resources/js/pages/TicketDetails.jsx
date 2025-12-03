@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import UserAvatar from '../components/UserAvatar';
 
 const statusColors = {
   NEW: 'bg-blue-100 text-blue-800',
@@ -238,19 +239,22 @@ const TicketDetails = () => {
                 {ticket?.data?.comments?.map((comment) => (
                   <div key={comment.id} className="border-l-4 border-blue-200 pl-4">
                     <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium text-gray-900">
-                          {comment.user?.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {comment.user?.role}
-                        </span>
+                      <div className="flex items-center space-x-3">
+                        <UserAvatar user={comment.user} size="sm" />
+                        <div>
+                          <span className="font-medium text-gray-900">
+                            {comment.user?.name}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {comment.user?.role}
+                          </span>
+                        </div>
                       </div>
                       <span className="text-sm text-gray-500">
                         {new Date(comment.created_at).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{comment.comment}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap ml-11">{comment.comment}</p>
                   </div>
                 ))}
                 

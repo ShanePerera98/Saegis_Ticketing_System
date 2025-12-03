@@ -43,6 +43,8 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role->value,
+                'profile_image' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+                'phone' => $user->phone,
             ],
             'abilities' => $this->getUserAbilities($user),
         ]);
@@ -66,6 +68,8 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role->value,
                 'is_active' => $user->is_active,
+                'profile_image' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+                'phone' => $user->phone,
             ],
             'abilities' => $this->getUserAbilities($user),
         ]);

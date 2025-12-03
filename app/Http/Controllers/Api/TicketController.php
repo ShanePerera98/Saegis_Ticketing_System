@@ -50,6 +50,20 @@ class TicketController extends Controller
 
         $tickets = $query->orderBy('created_at', 'desc')->paginate(15);
 
+        // Transform tickets to include profile image URLs
+        $tickets->getCollection()->transform(function ($ticket) {
+            if ($ticket->client && $ticket->client->profile_image) {
+                $ticket->client->profile_image = asset('storage/' . $ticket->client->profile_image);
+            }
+            if ($ticket->creator && $ticket->creator->profile_image) {
+                $ticket->creator->profile_image = asset('storage/' . $ticket->creator->profile_image);
+            }
+            if ($ticket->currentAssignee && $ticket->currentAssignee->profile_image) {
+                $ticket->currentAssignee->profile_image = asset('storage/' . $ticket->currentAssignee->profile_image);
+            }
+            return $ticket;
+        });
+
         return response()->json($tickets);
     }
 
@@ -84,7 +98,17 @@ class TicketController extends Controller
 
         $ticket = $this->ticketService->createTicket($validated, $user, $request->file('attachments'));
 
-        return response()->json($ticket->load(['category', 'client', 'creator', 'attachments']), 201);
+        $ticket->load(['category', 'client', 'creator', 'attachments']);
+
+        // Transform profile image URLs
+        if ($ticket->client && $ticket->client->profile_image) {
+            $ticket->client->profile_image = asset('storage/' . $ticket->client->profile_image);
+        }
+        if ($ticket->creator && $ticket->creator->profile_image) {
+            $ticket->creator->profile_image = asset('storage/' . $ticket->creator->profile_image);
+        }
+
+        return response()->json($ticket, 201);
     }
 
     public function show(Ticket $ticket, Request $request)
@@ -104,6 +128,53 @@ class TicketController extends Controller
             'attachments',
             'fieldValues.field',
         ]);
+
+        // Transform profile image URLs
+        if ($ticket->client && $ticket->client->profile_image) {
+            $ticket->client->profile_image = asset('storage/' . $ticket->client->profile_image);
+        }
+        if ($ticket->creator && $ticket->creator->profile_image) {
+            $ticket->creator->profile_image = asset('storage/' . $ticket->creator->profile_image);
+        }
+        if ($ticket->currentAssignee && $ticket->currentAssignee->profile_image) {
+            $ticket->currentAssignee->profile_image = asset('storage/' . $ticket->currentAssignee->profile_image);
+        }
+        
+        // Transform comment user profile images
+        if ($ticket->comments) {
+            foreach ($ticket->comments as $comment) {
+                if ($comment->user && $comment->user->profile_image) {
+                    $comment->user->profile_image = asset('storage/' . $comment->user->profile_image);
+                }
+            }
+        }
+
+        // Transform collaborator user profile images  
+        if ($ticket->collaborators) {
+            foreach ($ticket->collaborators as $collaborator) {
+                if ($collaborator->user && $collaborator->user->profile_image) {
+                    $collaborator->user->profile_image = asset('storage/' . $collaborator->user->profile_image);
+                }
+            }
+        }
+
+        // Transform status transition user profile images
+        if ($ticket->statusTransitions) {
+            foreach ($ticket->statusTransitions as $transition) {
+                if ($transition->changedBy && $transition->changedBy->profile_image) {
+                    $transition->changedBy->profile_image = asset('storage/' . $transition->changedBy->profile_image);
+                }
+            }
+        }
+
+        // Transform assignment user profile images
+        if ($ticket->assignments) {
+            foreach ($ticket->assignments as $assignment) {
+                if ($assignment->assignedTo && $assignment->assignedTo->profile_image) {
+                    $assignment->assignedTo->profile_image = asset('storage/' . $assignment->assignedTo->profile_image);
+                }
+            }
+        }
 
         return response()->json($ticket);
     }

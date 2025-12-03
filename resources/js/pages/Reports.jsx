@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ticketApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import AdminNavigation from '../components/AdminNavigation';
+import UserAvatar from '../components/UserAvatar';
 import { 
   BarChart, 
   Bar, 
@@ -299,7 +300,10 @@ const Reports = () => {
                       {ticket.title}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {ticket.client?.name}
+                      <div className="flex items-center space-x-2">
+                        <UserAvatar user={ticket.client} size="xs" />
+                        <span>{ticket.client?.name}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${

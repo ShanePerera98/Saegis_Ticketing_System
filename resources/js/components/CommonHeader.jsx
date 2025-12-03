@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LogoutModal from './LogoutModal';
 import NotificationBell from './NotificationBell';
+import UserAvatar from './UserAvatar';
 
 const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
   const { user, logout } = useAuth();
@@ -143,12 +144,10 @@ const CommonHeader = ({ onMenuToggle, isMenuOpen }) => {
           <div className="relative">
             <button 
               onClick={toggleProfileDropdown}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
               title="Profile Menu"
             >
-              <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              <UserAvatar user={user} size="sm" />
             </button>
             
             {/* Enhanced Profile Dropdown */}

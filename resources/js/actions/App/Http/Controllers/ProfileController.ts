@@ -319,7 +319,7 @@ updateProfileImage.post = (options?: RouteQueryOptions): RouteDefinition<'post'>
     updateProfileImage.form = updateProfileImageForm
 /**
 * @see \App\Http\Controllers\ProfileController::deleteProfileImage
- * @see app/Http/Controllers/ProfileController.php:196
+ * @see app/Http/Controllers/ProfileController.php:211
  * @route '/api/profile/image'
  */
 export const deleteProfileImage = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -334,7 +334,7 @@ deleteProfileImage.definition = {
 
 /**
 * @see \App\Http\Controllers\ProfileController::deleteProfileImage
- * @see app/Http/Controllers/ProfileController.php:196
+ * @see app/Http/Controllers/ProfileController.php:211
  * @route '/api/profile/image'
  */
 deleteProfileImage.url = (options?: RouteQueryOptions) => {
@@ -343,7 +343,7 @@ deleteProfileImage.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ProfileController::deleteProfileImage
- * @see app/Http/Controllers/ProfileController.php:196
+ * @see app/Http/Controllers/ProfileController.php:211
  * @route '/api/profile/image'
  */
 deleteProfileImage.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -353,7 +353,7 @@ deleteProfileImage.delete = (options?: RouteQueryOptions): RouteDefinition<'dele
 
     /**
 * @see \App\Http\Controllers\ProfileController::deleteProfileImage
- * @see app/Http/Controllers/ProfileController.php:196
+ * @see app/Http/Controllers/ProfileController.php:211
  * @route '/api/profile/image'
  */
     const deleteProfileImageForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -368,7 +368,7 @@ deleteProfileImage.delete = (options?: RouteQueryOptions): RouteDefinition<'dele
 
             /**
 * @see \App\Http\Controllers\ProfileController::deleteProfileImage
- * @see app/Http/Controllers/ProfileController.php:196
+ * @see app/Http/Controllers/ProfileController.php:211
  * @route '/api/profile/image'
  */
         deleteProfileImageForm.delete = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

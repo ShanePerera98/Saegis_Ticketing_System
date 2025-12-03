@@ -47,6 +47,8 @@ class UserController extends Controller
                               'email' => $user->email,
                               'role' => $user->role->value,
                               'is_active' => $user->is_active,
+                              'profile_image' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+                              'phone' => $user->phone,
                               'created_at' => $user->created_at,
                               'updated_at' => $user->updated_at,
                           ];
@@ -76,6 +78,8 @@ class UserController extends Controller
                 'email' => $targetUser->email,
                 'role' => $targetUser->role->value,
                 'is_active' => $targetUser->is_active,
+                'profile_image' => $targetUser->profile_image ? asset('storage/' . $targetUser->profile_image) : null,
+                'phone' => $targetUser->phone,
                 'created_at' => $targetUser->created_at,
                 'updated_at' => $targetUser->updated_at,
             ]

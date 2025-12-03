@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
 export const download = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ download.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
 download.url = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -46,7 +46,7 @@ download.url = (args: { ticket: number | { id: number }, attachment: number | { 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
 download.get = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -55,7 +55,7 @@ download.get = (args: { ticket: number | { id: number }, attachment: number | { 
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
 download.head = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -65,7 +65,7 @@ download.head = (args: { ticket: number | { id: number }, attachment: number | {
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
     const downloadForm = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -75,7 +75,7 @@ download.head = (args: { ticket: number | { id: number }, attachment: number | {
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
         downloadForm.get = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -84,7 +84,7 @@ download.head = (args: { ticket: number | { id: number }, attachment: number | {
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::download
- * @see app/Http/Controllers/Api/TicketController.php:634
+ * @see app/Http/Controllers/Api/TicketController.php:705
  * @route '/api/tickets/{ticket}/attachments/{attachment}/download'
  */
         downloadForm.head = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -100,7 +100,7 @@ download.head = (args: { ticket: number | { id: number }, attachment: number | {
     download.form = downloadForm
 /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
 export const view = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -115,7 +115,7 @@ view.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
 view.url = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -145,7 +145,7 @@ view.url = (args: { ticket: number | { id: number }, attachment: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
 view.get = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -154,7 +154,7 @@ view.get = (args: { ticket: number | { id: number }, attachment: number | { id: 
 })
 /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
 view.head = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -164,7 +164,7 @@ view.head = (args: { ticket: number | { id: number }, attachment: number | { id:
 
     /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
     const viewForm = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -174,7 +174,7 @@ view.head = (args: { ticket: number | { id: number }, attachment: number | { id:
 
             /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
         viewForm.get = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -183,7 +183,7 @@ view.head = (args: { ticket: number | { id: number }, attachment: number | { id:
         })
             /**
 * @see \App\Http\Controllers\Api\TicketController::view
- * @see app/Http/Controllers/Api/TicketController.php:649
+ * @see app/Http/Controllers/Api/TicketController.php:720
  * @route '/api/tickets/{ticket}/attachments/{attachment}/view'
  */
         viewForm.head = (args: { ticket: number | { id: number }, attachment: number | { id: number } } | [ticket: number | { id: number }, attachment: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

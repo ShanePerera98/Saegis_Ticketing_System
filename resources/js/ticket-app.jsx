@@ -9,7 +9,7 @@ import './utils/elasticScroll.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import ClientTickets from './pages/ClientTickets_test';
+import ClientTickets from './pages/ClientTickets';
 import TicketDetails from './pages/TicketDetails';
 import CancelledTickets from './pages/CancelledTickets';
 import MergeCenter from './pages/MergeCenter';

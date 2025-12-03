@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import UserAvatar from './UserAvatar';
 
 const UserList = ({ users, permissions, onEdit, onDelete, onSendPasswordReset, onResetPassword }) => {
   const { user: currentUser } = useAuth();
@@ -119,13 +120,7 @@ const UserList = ({ users, permissions, onEdit, onDelete, onSendPasswordReset, o
               <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                          {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                      </div>
-                    </div>
+                    <UserAvatar user={user} size="md" />
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {user.name}

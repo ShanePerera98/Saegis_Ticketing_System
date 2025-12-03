@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import UserAvatar from './UserAvatar';
 
 const TicketCard = ({ ticket, onAction }) => {
   const { user } = useAuth();
@@ -381,7 +382,11 @@ const TicketCard = ({ ticket, onAction }) => {
       <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 transition-colors">
         <div className="flex items-center gap-3">
           <span>Location: {ticket.location || 'Not specified'}</span>
-          <span>Raised by: {ticket.client?.name || 'Client'}</span>
+          <div className="flex items-center gap-1">
+            <span>Raised by:</span>
+            <UserAvatar user={ticket.client} size="xs" />
+            <span>{ticket.client?.name || 'Client'}</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className={getPriorityBadge(ticket.priority)}>
@@ -537,9 +542,13 @@ const TicketCard = ({ ticket, onAction }) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Raised by</label>
-                  <p className="text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
-                    {ticket.client?.name || 'Client'} ({ticket.client?.email || 'No email'})
-                  </p>
+                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+                    <UserAvatar user={ticket.client} size="sm" />
+                    <div className="text-gray-900 dark:text-gray-100">
+                      <div className="font-medium">{ticket.client?.name || 'Client'}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{ticket.client?.email || 'No email'}</div>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

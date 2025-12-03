@@ -174,11 +174,26 @@ class ProfileController extends Controller
             // Update user profile image path
             $user->update(['profile_image' => $path]);
 
+            // Log successful upload for debugging
+            \Log::info('Profile image uploaded successfully', [
+                'user_id' => $user->id,
+                'path' => $path,
+                'full_url' => asset('storage/' . $path)
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Profile image updated successfully',
                 'data' => [
-                    'profile_image' => asset('storage/' . $path)
+                    'profile_image' => asset('storage/' . $path),
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'role' => $user->role,
+                        'profile_image' => asset('storage/' . $path),
+                    ]
                 ]
             ]);
 

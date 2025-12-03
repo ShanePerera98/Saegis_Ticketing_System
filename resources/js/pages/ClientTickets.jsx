@@ -9,6 +9,7 @@ import Toast from '../components/Toast';
 import ScrollToTop from '../components/ScrollToTop';
 import ContentWrapper from '../components/ContentWrapper';
 import HeadsUpNotice from '../components/HeadsUpNotice';
+import UserAvatar from '../components/UserAvatar';
 
 const ClientTickets = () => {
   const { user } = useAuth();
@@ -148,15 +149,19 @@ const ClientTickets = () => {
   return (
     <>
       {/* Common Header */}
-      <CommonHeader />
+      <CommonHeader onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} isMenuOpen={isMenuOpen} />
       
       {/* Hamburger Menu */}
       <HamburgerMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       
-      <ContentWrapper>
+      <ContentWrapper isMenuOpen={isMenuOpen}>
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
           {/* Sidebar */}
-          <Sidebar />
+          <Sidebar 
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            ticketCounts={{}}
+          />
 
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Main Content */}
