@@ -60,6 +60,80 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Search for staff members (Admins and Super Admins) for ticket assignment
+     */
+    public function searchStaff(Request $request)
+    {
+        $user = $request->user();
+        
+        // Only admins and super admins can search for staff
+        if (!in_array($user->role->value, ['ADMIN', 'SUPER_ADMIN'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $searchTerm = $request->get('search', '');
+        
+        // Debug: Log the search attempt
+        \Log::info('Staff search attempted', [
+            'user_id' => $user->id,
+            'user_role' => $user->role->value,
+            'search_term' => $searchTerm
+        ]);
+        
+        $query = User::where('is_active', true)
+            ->whereIn('role', [UserRole::ADMIN, UserRole::SUPER_ADMIN]);
+
+        // Apply search filter (case-insensitive search by name and email)
+        if ($searchTerm) {
+            $searchTerm = strtolower($searchTerm);
+            $query->where(function($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ["%{$searchTerm}%"]);
+            });
+        }
+
+        // Apply role-based access control
+        if ($user->role === UserRole::ADMIN) {
+            // Admins can only see other admins, not super admins
+            $query->where('role', UserRole::ADMIN);
+        }
+        // Super admins can see all staff (admins and super admins)
+
+        $staff = $query->orderBy('name')
+                      ->limit(20) // Limit results for performance
+                      ->get()
+                      ->map(function ($staffMember) {
+                          return [
+                              'id' => $staffMember->id,
+                              'name' => $staffMember->name,
+                              'email' => $staffMember->email,
+                              'role' => $staffMember->role->value,
+                              'role_label' => $staffMember->role->label(),
+                              'profile_image' => $staffMember->profile_image ? asset('storage/' . $staffMember->profile_image) : null,
+                              'is_active' => $staffMember->is_active,
+                          ];
+                      });
+
+        // Debug: Log the results
+        \Log::info('Staff search results', [
+            'search_term' => $searchTerm,
+            'results_count' => $staff->count(),
+            'results' => $staff->take(3)->toArray() // Log first 3 results for debugging
+        ]);
+
+        return response()->json([
+            'users' => $staff,
+            'count' => $staff->count(),
+            'debug' => [
+                'search_term' => $searchTerm,
+                'user_role' => $user->role->value,
+                'total_active_users' => User::where('is_active', true)->count(),
+                'total_staff' => User::whereIn('role', [UserRole::ADMIN, UserRole::SUPER_ADMIN])->where('is_active', true)->count()
+            ]
+        ]);
+    }
+
     public function show(Request $request, $id)
     {
         $user = $request->user();

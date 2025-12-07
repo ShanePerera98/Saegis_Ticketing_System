@@ -47,6 +47,10 @@ const NotificationBell = () => {
       queryClient.invalidateQueries(['notifications']);
       queryClient.invalidateQueries(['tickets']);
     },
+    onError: (error) => {
+      console.error('Failed to accept collaboration:', error);
+      alert('Failed to accept collaboration request. Please try again.');
+    },
   });
 
   // Reject collaboration mutation
@@ -54,6 +58,10 @@ const NotificationBell = () => {
     mutationFn: (notificationId) => notificationApi.rejectCollaboration(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries(['notifications']);
+    },
+    onError: (error) => {
+      console.error('Failed to reject collaboration:', error);
+      alert('Failed to reject collaboration request. Please try again.');
     },
   });
 
@@ -178,31 +186,53 @@ const NotificationBell = () => {
                       <p className="text-sm font-medium text-gray-900">
                         {notification.title}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-3">
                         {notification.message}
                       </p>
+                      
+                      {/* Enhanced details for collaboration requests */}
+                      {notification.data?.type === 'collaboration_request' && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                          <div className="grid grid-cols-2 gap-1">
+                            <span className="font-medium">From:</span>
+                            <span>{notification.data?.requested_by?.name} ({notification.data?.requested_by?.role})</span>
+                            <span className="font-medium">Ticket:</span>
+                            <span>#{notification.data?.ticket_number}</span>
+                            <span className="font-medium">Status:</span>
+                            <span className="capitalize">{notification.data?.ticket_status?.toLowerCase().replace('_', ' ')}</span>
+                            <span className="font-medium">Priority:</span>
+                            <span className="capitalize">{notification.data?.ticket_priority?.toLowerCase()}</span>
+                          </div>
+                          {notification.data?.ticket_title && (
+                            <div className="mt-1 pt-1 border-t border-gray-200">
+                              <span className="font-medium">Title:</span> {notification.data.ticket_title}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
                       <p className="text-xs text-gray-400 mt-1">
                         {formatTimeAgo(notification.created_at)}
                       </p>
 
                       {/* Collaboration request actions */}
-                      {notification.type === 'collaboration_request' && notification.status === 'pending' && (
+                      {notification.data?.type === 'collaboration_request' && !notification.read_at && (
                         <div className="flex space-x-2 mt-2">
                           <button
                             onClick={(e) => handleAcceptCollaboration(notification.id, e)}
-                            className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200"
-                            disabled={acceptCollaborationMutation.isLoading}
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200 disabled:opacity-50"
+                            disabled={acceptCollaborationMutation.isPending}
                           >
                             <Check className="w-3 h-3 mr-1" />
-                            Accept
+                            {acceptCollaborationMutation.isPending ? 'Accepting...' : 'Accept'}
                           </button>
                           <button
                             onClick={(e) => handleRejectCollaboration(notification.id, e)}
-                            className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded hover:bg-red-200"
-                            disabled={rejectCollaborationMutation.isLoading}
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded hover:bg-red-200 disabled:opacity-50"
+                            disabled={rejectCollaborationMutation.isPending}
                           >
                             <X className="w-3 h-3 mr-1" />
-                            Decline
+                            {rejectCollaborationMutation.isPending ? 'Declining...' : 'Decline'}
                           </button>
                         </div>
                       )}

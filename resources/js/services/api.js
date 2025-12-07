@@ -93,6 +93,7 @@ export const ticketApi = {
   assignSelf: (id) => api.post(`/tickets/${id}/assign/self`),
   assign: (id, assigneeId) => api.post(`/tickets/${id}/assign`, { assignee_id: assigneeId }),
   addCollaborator: (id, userId) => api.post(`/tickets/${id}/collaborators`, { user_id: userId }),
+  requestCollaboration: (id, staffId, message) => api.post(`/tickets/${id}/request-collaboration`, { staff_id: staffId, message }),
   removeCollaborator: (id, userId) => api.delete(`/tickets/${id}/collaborators/${userId}`),
   updateStatus: (id, status, reason) => api.post(`/tickets/${id}/status`, { status, reason }),
   addComment: (id, data) => api.post(`/tickets/${id}/comments`, data),

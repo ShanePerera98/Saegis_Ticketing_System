@@ -10,21 +10,20 @@ const Sidebar = ({ selectedStatus, onStatusChange, ticketCounts = {} }) => {
     const baseStatuses = role === 'CLIENT' 
       ? [
           'New',
-          'Acquired',
           'In Progress', 
           'Pending',
           'Resolved',
-          'Canceled',
+          'Cancelled',
           'Closed',
           'Deleted'
         ]
       : [
           'New',
-          'Acquired',
+          'Acquired',  // Only admins/super admins can acquire tickets
           'In Progress', 
           'Pending',
           'Resolved',
-          'Canceled',
+          'Cancelled', // Fixed spelling to match backend
           'Closed',
           'Deleted'
         ];

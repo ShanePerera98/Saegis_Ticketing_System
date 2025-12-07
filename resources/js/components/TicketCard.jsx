@@ -6,14 +6,17 @@ const TicketCard = ({ ticket, onAction }) => {
   const { user } = useAuth();
   const [timer, setTimer] = useState('00:00:01');
   const [showActions, setShowActions] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [selectedAssignee, setSelectedAssignee] = useState('');
+  const [showInlineSearch, setShowInlineSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [searchCollaborator, setSearchCollaborator] = useState('');
   const [availableCollaborators, setAvailableCollaborators] = useState([]);
   const [showCollaboratorSearch, setShowCollaboratorSearch] = useState(false);
+  const [isSearchingCollaborators, setIsSearchingCollaborators] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
 
   // Get priority class for gradient border
@@ -96,8 +99,8 @@ const TicketCard = ({ ticket, onAction }) => {
   };
 
   const handleAssign = () => {
-    setShowAssignModal(true);
-    setShowActions(false);
+    setShowInlineSearch(true);
+    // Keep actions visible so search box shows immediately
   };
 
   // Get available actions based on ticket status and user role
@@ -141,7 +144,8 @@ const TicketCard = ({ ticket, onAction }) => {
             { label: 'View more info', action: 'viewDetails', style: 'bg-indigo-500 hover:bg-indigo-600' },
             { label: 'In Progress', action: 'progress', style: 'bg-blue-500 hover:bg-blue-600' },
             { label: 'Cancel', action: 'cancel', style: 'bg-red-500 hover:bg-red-600' },
-            { label: 'Close', action: 'close', style: 'bg-gray-500 hover:bg-gray-600' }
+            { label: 'Close', action: 'close', style: 'bg-gray-500 hover:bg-gray-600' },
+            { label: 'Send Collaboration Request', action: 'addCollaborator', style: 'bg-purple-500 hover:bg-purple-600' }
           ];
         }
         return [];
@@ -153,7 +157,7 @@ const TicketCard = ({ ticket, onAction }) => {
             { label: 'Resolve', action: 'resolve', style: 'bg-green-500 hover:bg-green-600' },
             { label: 'Cancel', action: 'cancel', style: 'bg-red-500 hover:bg-red-600' },
             { label: 'Close', action: 'close', style: 'bg-gray-500 hover:bg-gray-600' },
-            { label: 'Add Collaborator', action: 'addCollaborator', style: 'bg-purple-500 hover:bg-purple-600' }
+            { label: 'Send Collaboration Request', action: 'addCollaborator', style: 'bg-purple-500 hover:bg-purple-600' }
           ];
         }
         return [];
@@ -188,7 +192,7 @@ const TicketCard = ({ ticket, onAction }) => {
         setShowCollaboratorSearch(true);
         break;
       case 'assign':
-        setShowAssignModal(true);
+        setShowInlineSearch(true);
         break;
       case 'rate':
         setModalType('rate');
@@ -221,67 +225,101 @@ const TicketCard = ({ ticket, onAction }) => {
     setInputValue('');
   };
 
-  const confirmAssign = () => {
-    if (selectedAssignee) {
-      onAction('assign', ticket, { assignee: selectedAssignee });
-      setShowAssignModal(false);
-      setSelectedAssignee('');
+  // Search for staff members
+  const searchStaff = async (query) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      // Using the API endpoint we created
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch(`/api/users/search-staff?search=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      const data = await response.json();
+      setSearchResults(data.users || []);
+    } catch (error) {
+      console.error('Error searching staff:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
-  if (showAssignModal) {
-    return (
-      <div className={`bg-gray-200 dark:bg-gray-700 p-4 rounded-lg transition-colors ${getPriorityClass(ticket.priority)}`}>
-        <div className="mb-4">
-          <div className="font-medium text-gray-800 dark:text-gray-200 transition-colors">Issue Type: {ticket.title}</div>
-          <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">{ticket.description}</div>
-          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
-            <div className="flex items-center gap-3">
-              <span>Location: {ticket.location || 'Not specified'}</span>
-              <span>Raised by: Client id</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={getPriorityBadge(ticket.priority)}>
-                {ticket.priority || 'MEDIUM'}
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-            Select: Staff
-          </label>
-          <select
-            value={selectedAssignee}
-            onChange={(e) => setSelectedAssignee(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          >
-            <option value="">Choose staff member...</option>
-            <option value="admin1">Admin User 1</option>
-            <option value="admin2">Admin User 2</option>
-            <option value="superadmin1">Super Admin 1</option>
-          </select>
-        </div>
-        
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={() => setShowAssignModal(false)}
-            className="px-4 py-2 bg-orange-500 dark:bg-orange-600 text-white rounded-md hover:bg-orange-600 dark:hover:bg-orange-700 transition-colors"
-          >
-            Back
-          </button>
-          <button
-            onClick={confirmAssign}
-            disabled={!selectedAssignee}
-            className="px-4 py-2 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 transition-colors"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    searchStaff(value);
+  };
+
+  // Search for collaborators (same as staff since both use admin/super admin)
+  const searchCollaborators = async (query) => {
+    if (query.length < 2) {
+      setAvailableCollaborators([]);
+      return;
+    }
+    
+    setIsSearchingCollaborators(true);
+    try {
+      // Using the same API endpoint since collaborators are also staff
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch(`/api/users/search-staff?search=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      const data = await response.json();
+      setAvailableCollaborators(data.users || []);
+    } catch (error) {
+      console.error('Error searching collaborators:', error);
+      setAvailableCollaborators([]);
+    } finally {
+      setIsSearchingCollaborators(false);
+    }
+  };
+
+  const handleCollaboratorSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchCollaborator(value);
+    searchCollaborators(value);
+  };
+
+  const handleAddCollaborator = async (collaboratorId) => {
+    try {
+      const success = await onAction('addCollaborator', ticket, { userId: collaboratorId, message: '' });
+      if (success) {
+        setShowCollaboratorSearch(false);
+        setSearchCollaborator('');
+        setAvailableCollaborators([]);
+      }
+    } catch (error) {
+      console.error('Error adding collaborator:', error);
+    }
+  };
+
+  const selectStaff = (staff) => {
+    onAction('assign', ticket, { assignee: staff });
+    setShowInlineSearch(false);
+    setSearchTerm('');
+    setSearchResults([]);
+    // Close actions view after successful assignment
+    setShowActions(false);
+  };
+
+  const cancelSearch = () => {
+    setShowInlineSearch(false);
+    setSearchTerm('');
+    setSearchResults([]);
+  };
 
   if (showActions) {
     const actions = getAvailableActions();
@@ -325,34 +363,149 @@ const TicketCard = ({ ticket, onAction }) => {
           </div>
         )}
 
+        {/* Inline Staff Search for Assignment */}
+        {showInlineSearch && (
+          <div className="mt-4 p-3 bg-white dark:bg-gray-600 rounded-md border" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Search Staff to Assign
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Type staff name or email..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoFocus
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div className="mt-2 max-h-40 overflow-y-auto border border-gray-300 dark:border-gray-500 rounded-md bg-white dark:bg-gray-700">
+                  {searchResults.map((staff) => (
+                    <div
+                      key={staff.id}
+                      onClick={() => selectStaff(staff)}
+                      className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">{staff.name}</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">{staff.email}</div>
+                        </div>
+                        <div className="text-xs">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            staff.role === 'super_admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          }`}>
+                            {staff.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {searchTerm.length >= 2 && searchResults.length === 0 && !isSearching && (
+                <div className="mt-2 p-3 text-center text-gray-500 dark:text-gray-400 text-sm border border-gray-300 dark:border-gray-500 rounded-md">
+                  No staff members found
+                </div>
+              )}
+              
+              {searchTerm.length > 0 && searchTerm.length < 2 && (
+                <div className="mt-2 p-2 text-xs text-gray-500 dark:text-gray-400">
+                  Type at least 2 characters to search
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={cancelSearch}
+                className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Add Collaborator Search */}
         {showCollaboratorSearch && (
           <div className="mt-4 p-3 bg-white dark:bg-gray-600 rounded-md border" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="mb-3">
               <input
                 type="text"
-                placeholder="Search admin/super admin..."
+                placeholder="Search admin/super admin to add as collaborator..."
                 value={searchCollaborator}
-                onChange={(e) => setSearchCollaborator(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-sm"
+                onChange={handleCollaboratorSearchChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                autoFocus
               />
+            </div>
+            
+            {/* Search Results */}
+            <div className="max-h-32 overflow-y-auto">
+              {isSearchingCollaborators && (
+                <div className="text-center py-2 text-gray-500 dark:text-gray-400 text-sm">
+                  Searching...
+                </div>
+              )}
+              
+              {!isSearchingCollaborators && availableCollaborators.length > 0 && (
+                <div className="space-y-1">
+                  {availableCollaborators.map((collaborator) => (
+                    <div
+                      key={collaborator.id}
+                      onClick={() => handleAddCollaborator(collaborator.id)}
+                      className="p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md border transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                            {collaborator.name}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {collaborator.email} • {collaborator.role_label}
+                          </div>
+                        </div>
+                        <button className="px-2 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 transition-colors">
+                          Send Request
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {!isSearchingCollaborators && searchCollaborator.length >= 2 && availableCollaborators.length === 0 && (
+                <div className="mt-2 p-3 text-center text-gray-500 dark:text-gray-400 text-sm border border-gray-300 dark:border-gray-500 rounded-md">
+                  No admin/super admin users found
+                </div>
+              )}
+              
+              {searchCollaborator.length > 0 && searchCollaborator.length < 2 && (
+                <div className="mt-2 p-2 text-xs text-gray-500 dark:text-gray-400">
+                  Type at least 2 characters to search
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-2 justify-end mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <button
                 onClick={() => {
-                  // TODO: Add collaborator logic
                   setShowCollaboratorSearch(false);
                   setSearchCollaborator('');
+                  setAvailableCollaborators([]);
                 }}
-                disabled={!searchCollaborator.trim()}
-                className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 text-sm"
-              >
-                Add
-              </button>
-              <button
-                onClick={() => {
-                  setShowCollaboratorSearch(false);
-                  setSearchCollaborator('');
-                }}
-                className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
+                className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm transition-colors"
               >
                 Cancel
               </button>
@@ -668,6 +821,8 @@ const TicketCard = ({ ticket, onAction }) => {
           </div>
         </div>
       )}
+
+
     </div>
   );
 };

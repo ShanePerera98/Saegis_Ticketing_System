@@ -25,11 +25,54 @@ class TicketController extends Controller
     {
         $user = $request->user();
         
-        $query = Ticket::with(['category', 'client', 'currentAssignee', 'creator'])
-            ->when($user->isClient(), fn($q) => $q->forUser($user))
-            ->when($request->has('mine') && $request->mine, fn($q) => $q->assignedTo($user))
+        $query = Ticket::with(['category', 'client', 'currentAssignee', 'creator']);
+        
+        // INDIVIDUAL PROFILE-BASED FILTERING - NO SYSTEM-WIDE SHARING
+        if ($user->isClient()) {
+            // Clients see only their own tickets
+            $query->forUser($user);
+        } else {
+            // Admins/Super Admins: Individual profile-based ticket visibility by status
+            if ($request->has('status')) {
+                $status = $request->status;
+                
+                switch ($status) {
+                    case TicketStatus::NEW->value:
+                        // New tickets: unassigned tickets available to acquire (system-wide for admins)
+                        $query->where('status', $status)->whereNull('current_assignee_id');
+                        break;
+                        
+                    case TicketStatus::ACQUIRED->value:
+                    case TicketStatus::IN_PROGRESS->value:
+                    case TicketStatus::PENDING->value:
+                    case TicketStatus::RESOLVED->value:
+                    case TicketStatus::CANCELLED->value:
+                    case TicketStatus::CLOSED->value:
+                    case TicketStatus::DELETED->value:
+                        // All other statuses: tickets assigned to THIS user OR where they are a collaborator
+                        $query->where('status', $status)
+                              ->where(function($q) use ($user) {
+                                  $q->where('current_assignee_id', $user->id)
+                                    ->orWhereHas('collaborators', function($subq) use ($user) {
+                                        $subq->where('user_id', $user->id);
+                                    });
+                              });
+                        break;
+                        
+                    default:
+                        // Fallback: assigned to current user
+                        $query->where('status', $status)->where('current_assignee_id', $user->id);
+                        break;
+                }
+            } else {
+                // No status filter: show tickets assigned to current user
+                $query->assignedTo($user);
+            }
+        }
+        
+        // Apply additional filters
+        $query->when($request->has('mine') && $request->mine, fn($q) => $q->assignedTo($user))
             ->when($request->has('created_by_me') && $request->created_by_me, fn($q) => $q->where('created_by', $user->id))
-            ->when($request->has('status'), fn($q) => $q->byStatus($request->status))
             ->when($request->has('priority'), fn($q) => $q->byPriority($request->priority))
             ->when($request->has('category_id'), fn($q) => $q->where('category_id', $request->category_id))
             ->when($request->has('search'), function($q) use ($request) {
@@ -412,32 +455,92 @@ class TicketController extends Controller
     {
         Gate::authorize('viewStats', Ticket::class);
 
-        $query = Ticket::query();
+        $user = $request->user();
+        $baseQuery = Ticket::query();
 
+        // Apply date filters if provided
         if ($request->has('start')) {
-            $query->whereDate('created_at', '>=', $request->start);
+            $baseQuery->whereDate('created_at', '>=', $request->start);
         }
 
         if ($request->has('end')) {
-            $query->whereDate('created_at', '<=', $request->end);
+            $baseQuery->whereDate('created_at', '<=', $request->end);
         }
 
-        $total = $query->count();
-        $resolved = $query->where('status', TicketStatus::RESOLVED->value)->count();
-        $pending = $query->whereIn('status', [
-            TicketStatus::NEW->value,
-            TicketStatus::IN_PROGRESS->value,
-            TicketStatus::ON_HOLD->value
-        ])->count();
-        $overdue = $query->where('created_at', '<', now()->subDays(7))
-            ->whereNotIn('status', [TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value])
-            ->count();
+        // INDIVIDUAL PROFILE-BASED COUNTING - NO SYSTEM-WIDE SHARING
+        if ($user->isClient()) {
+            // Clients see only their own tickets
+            $baseQuery->forUser($user);
+            
+            $stats = [
+                'new' => (clone $baseQuery)->where('status', TicketStatus::NEW->value)->count(),
+                'acquired' => 0, // Clients don't acquire tickets
+                'in_progress' => (clone $baseQuery)->where('status', TicketStatus::IN_PROGRESS->value)->count(),
+                'pending' => (clone $baseQuery)->where('status', TicketStatus::PENDING->value)->count(),
+                'resolved' => (clone $baseQuery)->where('status', TicketStatus::RESOLVED->value)->count(),
+                'cancelled' => (clone $baseQuery)->where('status', TicketStatus::CANCELLED->value)->count(),
+                'closed' => (clone $baseQuery)->where('status', TicketStatus::CLOSED->value)->count(),
+                'deleted' => (clone $baseQuery)->where('status', TicketStatus::DELETED->value)->count(),
+            ];
+        } else {
+            // Admins and Super Admins see individual profile-based counts
+            $stats = [
+                // New tickets: unassigned tickets available to acquire
+                'new' => (clone $baseQuery)->where('status', TicketStatus::NEW->value)
+                    ->whereNull('current_assignee_id')->count(),
+                    
+                // Acquired: tickets assigned specifically to THIS user
+                'acquired' => (clone $baseQuery)->where('status', TicketStatus::ACQUIRED->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // In Progress: tickets in progress assigned to THIS user  
+                'in_progress' => (clone $baseQuery)->where('status', TicketStatus::IN_PROGRESS->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // Pending: tickets pending assigned to THIS user
+                'pending' => (clone $baseQuery)->where('status', TicketStatus::PENDING->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // Resolved: tickets resolved by THIS user
+                'resolved' => (clone $baseQuery)->where('status', TicketStatus::RESOLVED->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // Cancelled: tickets cancelled by THIS user
+                'cancelled' => (clone $baseQuery)->where('status', TicketStatus::CANCELLED->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // Closed: tickets closed by THIS user
+                'closed' => (clone $baseQuery)->where('status', TicketStatus::CLOSED->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+                    
+                // Deleted: tickets deleted by THIS user (only for super admins typically)
+                'deleted' => (clone $baseQuery)->where('status', TicketStatus::DELETED->value)
+                    ->where('current_assignee_id', $user->id)->count(),
+            ];
+        }
 
+        // Calculate additional metrics based on individual profile
+        $totalUserTickets = array_sum(array_values($stats));
+        
         return response()->json([
-            'total' => $total,
-            'resolved' => $resolved,
-            'pending' => $pending,
-            'overdue' => $overdue,
+            // Individual profile stats
+            'new' => $stats['new'],
+            'acquired' => $stats['acquired'],
+            'in_progress' => $stats['in_progress'],
+            'pending' => $stats['pending'],
+            'resolved' => $stats['resolved'],
+            'cancelled' => $stats['cancelled'],
+            'closed' => $stats['closed'],
+            'deleted' => $stats['deleted'],
+            
+            // Legacy compatibility (now individual-based)
+            'total' => $totalUserTickets,
+            'overdue' => $user->isClient() 
+                ? (clone $baseQuery)->where('created_at', '<', now()->subDays(7))
+                    ->whereNotIn('status', [TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value])->count()
+                : (clone $baseQuery)->where('created_at', '<', now()->subDays(7))
+                    ->where('current_assignee_id', $user->id)
+                    ->whereNotIn('status', [TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value])->count(),
         ]);
     }
 
@@ -734,6 +837,253 @@ class TicketController extends Controller
         return response()->file($filePath, [
             'Content-Type' => $attachment->mime_type,
             'Content-Disposition' => 'inline; filename="' . $attachment->original_name . '"'
+        ]);
+    }
+
+    /**
+     * Assign ticket to a specific staff member (Super Admin functionality)
+     */
+    public function assignToStaff(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'staff_id' => 'required|exists:users,id',
+            'note' => 'nullable|string|max:500'
+        ]);
+
+        $user = $request->user();
+        $staffMember = User::findOrFail($request->staff_id);
+
+        // Only Super Admins can directly assign tickets
+        if (!$user->isSuperAdmin()) {
+            return response()->json(['message' => 'Only Super Admins can directly assign tickets'], 403);
+        }
+
+        // Staff member must be Admin or Super Admin
+        if (!$staffMember->isAdmin() && !$staffMember->isSuperAdmin()) {
+            return response()->json(['message' => 'Can only assign to Admin or Super Admin staff'], 400);
+        }
+
+        // Update ticket assignment
+        $ticket->update([
+            'status' => TicketStatus::ACQUIRED,
+            'current_assignee_id' => $staffMember->id
+        ]);
+
+        // Log the assignment activity
+        $ticket->recordActivity([
+            'action' => 'assigned',
+            'description' => "Ticket assigned to {$staffMember->name} by {$user->name}" . 
+                           ($request->note ? " - Note: {$request->note}" : ''),
+            'user_id' => $user->id,
+            'changes' => [
+                'assigned_to' => $staffMember->name,
+                'assigned_by' => $user->name,
+                'status' => 'ACQUIRED'
+            ]
+        ]);
+
+        // Send notification to client about assignment
+        $ticket->client->notify(new \App\Notifications\TicketAssigned($ticket, $staffMember));
+
+        // Send notification to assigned staff member
+        $staffMember->notify(new \App\Notifications\TicketAssignedToYou($ticket, $user));
+
+        return response()->json([
+            'message' => "Ticket successfully assigned to {$staffMember->name}",
+            'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee'])
+        ]);
+    }
+
+    /**
+     * Request collaboration on a ticket (Admin functionality)
+     */
+    public function requestCollaboration(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'staff_id' => 'required|exists:users,id',
+            'message' => 'nullable|string|max:500'
+        ]);
+
+        $user = $request->user();
+        $collaborator = User::findOrFail($request->staff_id);
+
+        // Only ticket assignees can request collaboration
+        if ($ticket->current_assignee_id !== $user->id) {
+            return response()->json(['message' => 'Only assigned staff can request collaboration'], 403);
+        }
+
+        // Collaborator must be Admin or Super Admin
+        if (!$collaborator->isAdmin() && !$collaborator->isSuperAdmin()) {
+            return response()->json(['message' => 'Can only request collaboration from Admin or Super Admin staff'], 400);
+        }
+
+        // Cannot request collaboration with yourself
+        if ($collaborator->id === $user->id) {
+            return response()->json(['message' => 'Cannot request collaboration with yourself'], 400);
+        }
+
+        // Check if already collaborating
+        $existingCollaborator = $ticket->collaborators()->where('user_id', $collaborator->id)->exists();
+        if ($existingCollaborator) {
+            return response()->json(['message' => 'User is already collaborating on this ticket'], 400);
+        }
+
+        // Send collaboration request notification
+        $collaborator->notify(new \App\Notifications\CollaborationRequest($ticket, $user, $request->message));
+
+        // Log the request
+        $ticket->recordActivity([
+            'action' => 'collaboration_requested',
+            'description' => "Collaboration requested from {$collaborator->name} by {$user->name}",
+            'user_id' => $user->id,
+            'changes' => [
+                'collaboration_requested_to' => $collaborator->name,
+                'requested_by' => $user->name
+            ]
+        ]);
+
+        return response()->json([
+            'message' => "Collaboration request sent to {$collaborator->name}",
+            'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee', 'collaborators.user'])
+        ]);
+    }
+
+    /**
+     * Accept or decline collaboration request
+     */
+    public function respondToCollaboration(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'action' => 'required|in:accept,decline',
+            'note' => 'nullable|string|max:500'
+        ]);
+
+        $user = $request->user();
+        $action = $request->action;
+
+        if ($action === 'accept') {
+            // Add user as collaborator
+            $ticket->collaborators()->create([
+                'user_id' => $user->id,
+                'role' => 'collaborator',
+                'added_by' => $ticket->current_assignee_id ?? $user->id,
+                'added_at' => now()
+            ]);
+
+            // If the ticket is ACQUIRED or IN_PROGRESS, assign the user to it based on current status
+            $currentStatus = $ticket->status;
+            if ($currentStatus === \App\Enums\TicketStatus::ACQUIRED || 
+                $currentStatus === \App\Enums\TicketStatus::IN_PROGRESS) {
+                
+                // Create assignment record for the collaborator
+                $ticket->assignments()->create([
+                    'assigned_to' => $user->id,
+                    'assigned_at' => now(),
+                    'assigned_by' => $ticket->current_assignee_id ?? $user->id,
+                    'is_current' => false // They are a collaborator, not the main assignee
+                ]);
+                
+                $statusMessage = $currentStatus === \App\Enums\TicketStatus::ACQUIRED ? 
+                    "added to your Acquired queue" : 
+                    "added to your In Progress queue";
+                    
+                $responseMessage = "Collaboration request accepted. Ticket has been {$statusMessage}.";
+            } else {
+                $responseMessage = 'Collaboration request accepted. You are now a collaborator on this ticket.';
+            }
+
+            // Log the acceptance
+            $ticket->recordActivity([
+                'action' => 'collaboration_accepted',
+                'description' => "Collaboration accepted by {$user->name}" . 
+                               ($request->note ? " - Note: {$request->note}" : '') .
+                               " (Status: {$currentStatus->value})",
+                'user_id' => $user->id,
+                'changes' => [
+                    'collaborator_added' => $user->name,
+                    'action' => 'accepted',
+                    'ticket_status' => $currentStatus->value
+                ]
+            ]);
+
+            return response()->json([
+                'message' => $responseMessage,
+                'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee', 'collaborators.user', 'assignments'])
+            ]);
+        } else {
+            // Log the decline
+            $ticket->recordActivity([
+                'action' => 'collaboration_declined',
+                'description' => "Collaboration declined by {$user->name}" . 
+                               ($request->note ? " - Note: {$request->note}" : ''),
+                'user_id' => $user->id,
+                'changes' => [
+                    'collaboration_declined_by' => $user->name,
+                    'action' => 'declined'
+                ]
+            ]);
+
+            return response()->json([
+                'message' => 'Collaboration request declined'
+            ]);
+        }
+    }
+
+    /**
+     * Leave collaboration on a ticket
+     */
+    public function leaveCollaboration(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        // Check if user is the primary assignee or collaborator
+        $isAssignee = $ticket->current_assignee_id === $user->id;
+        $isCollaborator = $ticket->collaborators()->where('user_id', $user->id)->exists();
+
+        if (!$isAssignee && !$isCollaborator) {
+            return response()->json(['message' => 'You are not assigned to this ticket'], 403);
+        }
+
+        // Count total staff on ticket (assignee + collaborators)
+        $totalStaff = 1 + $ticket->collaborators()->count(); // 1 for assignee + collaborators
+
+        // Must have at least one staff member remaining
+        if ($totalStaff <= 1) {
+            return response()->json(['message' => 'Cannot leave ticket - at least one staff member must remain assigned'], 400);
+        }
+
+        if ($isAssignee) {
+            // If primary assignee is leaving, promote a collaborator to assignee
+            $newAssignee = $ticket->collaborators()->first();
+            if ($newAssignee) {
+                $ticket->update(['current_assignee_id' => $newAssignee->user_id]);
+                $ticket->collaborators()->where('id', $newAssignee->id)->delete();
+                
+                $newAssigneeUser = $newAssignee->user;
+                $logMessage = "Primary assignee {$user->name} left ticket. {$newAssigneeUser->name} promoted to primary assignee";
+            } else {
+                return response()->json(['message' => 'Cannot leave - no collaborators to promote to primary assignee'], 400);
+            }
+        } else {
+            // Remove collaborator
+            $ticket->collaborators()->where('user_id', $user->id)->delete();
+            $logMessage = "Collaborator {$user->name} left ticket";
+        }
+
+        // Log the activity
+        $ticket->recordActivity([
+            'action' => 'left_collaboration',
+            'description' => $logMessage,
+            'user_id' => $user->id,
+            'changes' => [
+                'staff_left' => $user->name,
+                'remaining_staff' => $totalStaff - 1
+            ]
+        ]);
+
+        return response()->json([
+            'message' => 'Successfully left ticket collaboration',
+            'ticket' => $ticket->fresh(['category', 'client', 'currentAssignee', 'collaborators.user'])
         ]);
     }
 }

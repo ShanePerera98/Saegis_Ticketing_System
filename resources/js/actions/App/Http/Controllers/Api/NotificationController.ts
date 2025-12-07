@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
     const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
         indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\NotificationController::index
- * @see app/Http/Controllers/Api/NotificationController.php:12
+ * @see app/Http/Controllers/Api/NotificationController.php:11
  * @route '/api/notifications'
  */
         indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
 export const unread = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ unread.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
 unread.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ unread.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
 unread.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +112,7 @@ unread.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
 unread.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -122,7 +122,7 @@ unread.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
     const unreadForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -132,7 +132,7 @@ unread.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
         unreadForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -141,7 +141,7 @@ unread.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Api\NotificationController::unread
- * @see app/Http/Controllers/Api/NotificationController.php:24
+ * @see app/Http/Controllers/Api/NotificationController.php:22
  * @route '/api/notifications/unread'
  */
         unreadForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -157,7 +157,7 @@ unread.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     unread.form = unreadForm
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAllAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:51
+ * @see app/Http/Controllers/Api/NotificationController.php:53
  * @route '/api/notifications/mark-all-read'
  */
 export const markAllAsRead = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -172,7 +172,7 @@ markAllAsRead.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAllAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:51
+ * @see app/Http/Controllers/Api/NotificationController.php:53
  * @route '/api/notifications/mark-all-read'
  */
 markAllAsRead.url = (options?: RouteQueryOptions) => {
@@ -181,7 +181,7 @@ markAllAsRead.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAllAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:51
+ * @see app/Http/Controllers/Api/NotificationController.php:53
  * @route '/api/notifications/mark-all-read'
  */
 markAllAsRead.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -191,7 +191,7 @@ markAllAsRead.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
     /**
 * @see \App\Http\Controllers\Api\NotificationController::markAllAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:51
+ * @see app/Http/Controllers/Api/NotificationController.php:53
  * @route '/api/notifications/mark-all-read'
  */
     const markAllAsReadForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -201,7 +201,7 @@ markAllAsRead.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
             /**
 * @see \App\Http\Controllers\Api\NotificationController::markAllAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:51
+ * @see app/Http/Controllers/Api/NotificationController.php:53
  * @route '/api/notifications/mark-all-read'
  */
         markAllAsReadForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -212,10 +212,10 @@ markAllAsRead.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
     markAllAsRead.form = markAllAsReadForm
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:40
+ * @see app/Http/Controllers/Api/NotificationController.php:36
  * @route '/api/notifications/{notification}/read'
  */
-export const markAsRead = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+export const markAsRead = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: markAsRead.url(args, options),
     method: 'post',
 })
@@ -227,17 +227,14 @@ markAsRead.definition = {
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:40
+ * @see app/Http/Controllers/Api/NotificationController.php:36
  * @route '/api/notifications/{notification}/read'
  */
-markAsRead.url = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+markAsRead.url = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { notification: args }
     }
 
-            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
-            args = { notification: args.id }
-        }
     
     if (Array.isArray(args)) {
         args = {
@@ -248,9 +245,7 @@ markAsRead.url = (args: { notification: number | { id: number } } | [notificatio
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-                        notification: typeof args.notification === 'object'
-                ? args.notification.id
-                : args.notification,
+                        notification: args.notification,
                 }
 
     return markAsRead.definition.url
@@ -260,63 +255,60 @@ markAsRead.url = (args: { notification: number | { id: number } } | [notificatio
 
 /**
 * @see \App\Http\Controllers\Api\NotificationController::markAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:40
+ * @see app/Http/Controllers/Api/NotificationController.php:36
  * @route '/api/notifications/{notification}/read'
  */
-markAsRead.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+markAsRead.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: markAsRead.url(args, options),
     method: 'post',
 })
 
     /**
 * @see \App\Http\Controllers\Api\NotificationController::markAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:40
+ * @see app/Http/Controllers/Api/NotificationController.php:36
  * @route '/api/notifications/{notification}/read'
  */
-    const markAsReadForm = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const markAsReadForm = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: markAsRead.url(args, options),
         method: 'post',
     })
 
             /**
 * @see \App\Http\Controllers\Api\NotificationController::markAsRead
- * @see app/Http/Controllers/Api/NotificationController.php:40
+ * @see app/Http/Controllers/Api/NotificationController.php:36
  * @route '/api/notifications/{notification}/read'
  */
-        markAsReadForm.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        markAsReadForm.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: markAsRead.url(args, options),
             method: 'post',
         })
     
     markAsRead.form = markAsReadForm
 /**
-* @see \App\Http\Controllers\Api\NotificationController::acceptCollaborationRequest
+* @see \App\Http\Controllers\Api\NotificationController::acceptCollaboration
  * @see app/Http/Controllers/Api/NotificationController.php:62
  * @route '/api/notifications/{notification}/accept'
  */
-export const acceptCollaborationRequest = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: acceptCollaborationRequest.url(args, options),
+export const acceptCollaboration = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: acceptCollaboration.url(args, options),
     method: 'post',
 })
 
-acceptCollaborationRequest.definition = {
+acceptCollaboration.definition = {
     methods: ["post"],
     url: '/api/notifications/{notification}/accept',
 } satisfies RouteDefinition<["post"]>
 
 /**
-* @see \App\Http\Controllers\Api\NotificationController::acceptCollaborationRequest
+* @see \App\Http\Controllers\Api\NotificationController::acceptCollaboration
  * @see app/Http/Controllers/Api/NotificationController.php:62
  * @route '/api/notifications/{notification}/accept'
  */
-acceptCollaborationRequest.url = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+acceptCollaboration.url = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { notification: args }
     }
 
-            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
-            args = { notification: args.id }
-        }
     
     if (Array.isArray(args)) {
         args = {
@@ -327,75 +319,70 @@ acceptCollaborationRequest.url = (args: { notification: number | { id: number } 
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-                        notification: typeof args.notification === 'object'
-                ? args.notification.id
-                : args.notification,
+                        notification: args.notification,
                 }
 
-    return acceptCollaborationRequest.definition.url
+    return acceptCollaboration.definition.url
             .replace('{notification}', parsedArgs.notification.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
 
 /**
-* @see \App\Http\Controllers\Api\NotificationController::acceptCollaborationRequest
+* @see \App\Http\Controllers\Api\NotificationController::acceptCollaboration
  * @see app/Http/Controllers/Api/NotificationController.php:62
  * @route '/api/notifications/{notification}/accept'
  */
-acceptCollaborationRequest.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: acceptCollaborationRequest.url(args, options),
+acceptCollaboration.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: acceptCollaboration.url(args, options),
     method: 'post',
 })
 
     /**
-* @see \App\Http\Controllers\Api\NotificationController::acceptCollaborationRequest
+* @see \App\Http\Controllers\Api\NotificationController::acceptCollaboration
  * @see app/Http/Controllers/Api/NotificationController.php:62
  * @route '/api/notifications/{notification}/accept'
  */
-    const acceptCollaborationRequestForm = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: acceptCollaborationRequest.url(args, options),
+    const acceptCollaborationForm = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: acceptCollaboration.url(args, options),
         method: 'post',
     })
 
             /**
-* @see \App\Http\Controllers\Api\NotificationController::acceptCollaborationRequest
+* @see \App\Http\Controllers\Api\NotificationController::acceptCollaboration
  * @see app/Http/Controllers/Api/NotificationController.php:62
  * @route '/api/notifications/{notification}/accept'
  */
-        acceptCollaborationRequestForm.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: acceptCollaborationRequest.url(args, options),
+        acceptCollaborationForm.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: acceptCollaboration.url(args, options),
             method: 'post',
         })
     
-    acceptCollaborationRequest.form = acceptCollaborationRequestForm
+    acceptCollaboration.form = acceptCollaborationForm
 /**
-* @see \App\Http\Controllers\Api\NotificationController::rejectCollaborationRequest
- * @see app/Http/Controllers/Api/NotificationController.php:88
+* @see \App\Http\Controllers\Api\NotificationController::rejectCollaboration
+ * @see app/Http/Controllers/Api/NotificationController.php:123
  * @route '/api/notifications/{notification}/reject'
  */
-export const rejectCollaborationRequest = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: rejectCollaborationRequest.url(args, options),
+export const rejectCollaboration = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: rejectCollaboration.url(args, options),
     method: 'post',
 })
 
-rejectCollaborationRequest.definition = {
+rejectCollaboration.definition = {
     methods: ["post"],
     url: '/api/notifications/{notification}/reject',
 } satisfies RouteDefinition<["post"]>
 
 /**
-* @see \App\Http\Controllers\Api\NotificationController::rejectCollaborationRequest
- * @see app/Http/Controllers/Api/NotificationController.php:88
+* @see \App\Http\Controllers\Api\NotificationController::rejectCollaboration
+ * @see app/Http/Controllers/Api/NotificationController.php:123
  * @route '/api/notifications/{notification}/reject'
  */
-rejectCollaborationRequest.url = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+rejectCollaboration.url = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { notification: args }
     }
 
-            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
-            args = { notification: args.id }
-        }
     
     if (Array.isArray(args)) {
         args = {
@@ -406,47 +393,45 @@ rejectCollaborationRequest.url = (args: { notification: number | { id: number } 
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-                        notification: typeof args.notification === 'object'
-                ? args.notification.id
-                : args.notification,
+                        notification: args.notification,
                 }
 
-    return rejectCollaborationRequest.definition.url
+    return rejectCollaboration.definition.url
             .replace('{notification}', parsedArgs.notification.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
 
 /**
-* @see \App\Http\Controllers\Api\NotificationController::rejectCollaborationRequest
- * @see app/Http/Controllers/Api/NotificationController.php:88
+* @see \App\Http\Controllers\Api\NotificationController::rejectCollaboration
+ * @see app/Http/Controllers/Api/NotificationController.php:123
  * @route '/api/notifications/{notification}/reject'
  */
-rejectCollaborationRequest.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: rejectCollaborationRequest.url(args, options),
+rejectCollaboration.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: rejectCollaboration.url(args, options),
     method: 'post',
 })
 
     /**
-* @see \App\Http\Controllers\Api\NotificationController::rejectCollaborationRequest
- * @see app/Http/Controllers/Api/NotificationController.php:88
+* @see \App\Http\Controllers\Api\NotificationController::rejectCollaboration
+ * @see app/Http/Controllers/Api/NotificationController.php:123
  * @route '/api/notifications/{notification}/reject'
  */
-    const rejectCollaborationRequestForm = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: rejectCollaborationRequest.url(args, options),
+    const rejectCollaborationForm = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: rejectCollaboration.url(args, options),
         method: 'post',
     })
 
             /**
-* @see \App\Http\Controllers\Api\NotificationController::rejectCollaborationRequest
- * @see app/Http/Controllers/Api/NotificationController.php:88
+* @see \App\Http\Controllers\Api\NotificationController::rejectCollaboration
+ * @see app/Http/Controllers/Api/NotificationController.php:123
  * @route '/api/notifications/{notification}/reject'
  */
-        rejectCollaborationRequestForm.post = (args: { notification: number | { id: number } } | [notification: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: rejectCollaborationRequest.url(args, options),
+        rejectCollaborationForm.post = (args: { notification: string | number } | [notification: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: rejectCollaboration.url(args, options),
             method: 'post',
         })
     
-    rejectCollaborationRequest.form = rejectCollaborationRequestForm
-const NotificationController = { index, unread, markAllAsRead, markAsRead, acceptCollaborationRequest, rejectCollaborationRequest }
+    rejectCollaboration.form = rejectCollaborationForm
+const NotificationController = { index, unread, markAllAsRead, markAsRead, acceptCollaboration, rejectCollaboration }
 
 export default NotificationController

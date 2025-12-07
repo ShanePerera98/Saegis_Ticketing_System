@@ -136,13 +136,33 @@ const ClientTickets = () => {
     }
   };
 
-  // Query to fetch user's tickets for the status filter
+  // Map frontend status names to backend enum values
+  const mapStatusToBackend = (status) => {
+    const statusMap = {
+      'New': 'NEW',
+      'In Progress': 'IN_PROGRESS',
+      'Pending': 'PENDING', 
+      'Resolved': 'RESOLVED',
+      'Cancelled': 'CANCELLED',
+      'Closed': 'CLOSED',
+      'Deleted': 'DELETED'
+    };
+    return statusMap[status] || status.toUpperCase();
+  };
+
+  // Query to fetch client's individual tickets
   const { data: tickets } = useQuery({
-    queryKey: ['user-tickets', selectedStatus],
+    queryKey: ['user-tickets', selectedStatus, user?.id],
     queryFn: () => ticketApi.list({ 
-      status: selectedStatus,
-      client_id: user?.id 
+      status: mapStatusToBackend(selectedStatus)
     }),
+    enabled: !!user
+  });
+
+  // Query to fetch client's individual ticket statistics
+  const { data: stats = {} } = useQuery({
+    queryKey: ['client-ticket-stats', user?.id],
+    queryFn: () => ticketApi.getStats(),
     enabled: !!user
   });
 
@@ -160,31 +180,21 @@ const ClientTickets = () => {
           <Sidebar 
             selectedStatus={selectedStatus}
             onStatusChange={setSelectedStatus}
-            ticketCounts={{}}
+            ticketCounts={{
+              'New': stats.new || 0,
+              'In Progress': stats.in_progress || 0,
+              'Pending': stats.pending || 0,
+              'Resolved': stats.resolved || 0,
+              'Cancelled': stats.cancelled || 0,
+              'Closed': stats.closed || 0,
+              'Deleted': stats.deleted || 0
+            }}
           />
 
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Main Content */}
             <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900">
               <div className="container mx-auto px-6 py-8">
-                {/* Status Filter */}
-                <div className="mb-6">
-                  <div className="flex flex-wrap gap-3">
-                    {['New', 'Open', 'In Progress', 'Resolved', 'Closed'].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => setSelectedStatus(status)}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          selectedStatus === status
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Create New Ticket Form */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">

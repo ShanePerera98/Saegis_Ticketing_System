@@ -190,7 +190,8 @@ class TicketPolicy
      */
     public function viewStats(User $user): bool
     {
-        return $user->isAdmin();
+        // All authenticated users can view their individual profile stats
+        return $user->isAdmin() || $user->isClient();
     }
 
     /**

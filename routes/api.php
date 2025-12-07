@@ -56,10 +56,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // Assignment routes
         Route::post('/{ticket}/assign/self', [TicketController::class, 'assignSelf']);
         Route::post('/{ticket}/assign', [TicketController::class, 'assign']);
+        Route::post('/{ticket}/assign-staff', [TicketController::class, 'assignToStaff']); // Super Admin direct assignment
 
         // Collaboration routes
         Route::post('/{ticket}/collaborators', [TicketController::class, 'addCollaborator']);
         Route::delete('/{ticket}/collaborators/{user}', [TicketController::class, 'removeCollaborator']);
+        Route::post('/{ticket}/request-collaboration', [TicketController::class, 'requestCollaboration']); // Request collaboration
+        Route::post('/{ticket}/respond-collaboration', [TicketController::class, 'respondToCollaboration']); // Accept/decline collaboration
+        Route::post('/{ticket}/leave-collaboration', [TicketController::class, 'leaveCollaboration']); // Leave ticket
 
         // Status management
         Route::post('/{ticket}/status', [TicketController::class, 'updateStatus']);
@@ -97,8 +101,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/unread', [NotificationController::class, 'unread']);
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
         Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
-        Route::post('/{notification}/accept', [NotificationController::class, 'acceptCollaborationRequest']);
-        Route::post('/{notification}/reject', [NotificationController::class, 'rejectCollaborationRequest']);
+        Route::post('/{notification}/accept', [NotificationController::class, 'acceptCollaboration']);
+        Route::post('/{notification}/reject', [NotificationController::class, 'rejectCollaboration']);
     });
 
     // Template management
@@ -118,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // User Management routes
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
+        Route::get('/search-staff', [UserController::class, 'searchStaff']); // Search staff for ticket assignment
         Route::get('/{user}', [UserController::class, 'show']);
         Route::post('/', [UserController::class, 'store']);
         Route::patch('/{user}', [UserController::class, 'update']);

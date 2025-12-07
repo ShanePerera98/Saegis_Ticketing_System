@@ -20,12 +20,26 @@ const Dashboard = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
 
-  // Fetch tickets using React Query
+  // Map frontend status names to backend enum values
+  const mapStatusToBackend = (status) => {
+    const statusMap = {
+      'New': 'NEW',
+      'Acquired': 'ACQUIRED',
+      'In Progress': 'IN_PROGRESS',
+      'Pending': 'PENDING', 
+      'Resolved': 'RESOLVED',
+      'Cancelled': 'CANCELLED',
+      'Closed': 'CLOSED',
+      'Deleted': 'DELETED'
+    };
+    return statusMap[status] || status.toUpperCase();
+  };
+
+  // Fetch individual profile-based tickets using React Query
   const { data: tickets = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['tickets', selectedStatus],
+    queryKey: ['tickets', selectedStatus, user?.id], // Include user ID for individual filtering
     queryFn: () => {
-      const params = { status: selectedStatus === 'New' ? 'NEW' : selectedStatus.toUpperCase() };
-      // Don't add 'mine' parameter for admins to see all tickets
+      const params = { status: mapStatusToBackend(selectedStatus) };
       return ticketApi.list(params);
     },
     select: (data) => data.data.data || data.data || [],
@@ -33,9 +47,9 @@ const Dashboard = () => {
     refetchInterval: 60000, // Refetch every minute
   });
 
-  // Fetch ticket statistics
+  // Fetch individual profile-based ticket statistics  
   const { data: stats = {} } = useQuery({
-    queryKey: ['ticket-stats'],
+    queryKey: ['ticket-stats', user?.id], // Individual user stats
     queryFn: () => ticketApi.getStats(),
     select: (data) => data.data || {},
     staleTime: 60000, // 1 minute
@@ -125,7 +139,7 @@ const Dashboard = () => {
 
         case 'addCollaborator':
           if (data?.userId) {
-            await ticketApi.addCollaborator(ticket.id, data.userId);
+            await ticketApi.requestCollaboration(ticket.id, data.userId, data?.message || '');
             showToastMessage(`Collaboration request sent for ticket ${ticket.ticket_number}`, 'success');
             refetch();
           }
@@ -173,16 +187,16 @@ const Dashboard = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Calculate ticket counts from stats API or fallback to default values
+  // Calculate individual profile-based ticket counts from stats API
   const ticketCounts = {
     'New': stats.new || 0,
+    'Acquired': stats.acquired || 0, // Individual acquired tickets for this user
     'In Progress': stats.in_progress || 0,
     'Pending': stats.pending || 0,
     'Resolved': stats.resolved || 0,
-    'Canceled': stats.canceled || 0,
+    'Cancelled': stats.cancelled || 0, // Fixed spelling to match backend
     'Closed': stats.closed || 0,
-    'Deleted': stats.deleted || 0,
-    'See Others Queue': stats.others_queue || 0
+    'Deleted': stats.deleted || 0
   };
 
   // Filter tickets based on selected status

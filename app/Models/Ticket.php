@@ -102,6 +102,11 @@ class Ticket extends Model
         return $this->hasMany(TicketCollaborator::class);
     }
 
+    public function activityLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ActivityLog::class, 'subject');
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(TicketComment::class)->orderBy('created_at');
@@ -568,6 +573,24 @@ class Ticket extends Model
                 'changed_by' => $changer->name
             ],
             'status' => 'pending',
+        ]);
+    }
+
+    /**
+     * Record activity for this ticket
+     */
+    public function recordActivity($data)
+    {
+        // Create activity log entry using Spatie Activity Log format
+        ActivityLog::create([
+            'log_name' => 'ticket',
+            'description' => $data['description'] ?? '',
+            'subject_type' => 'App\\Models\\Ticket',
+            'subject_id' => $this->id,
+            'event' => $data['action'] ?? 'unknown',
+            'causer_type' => 'App\\Models\\User',
+            'causer_id' => $data['user_id'] ?? auth()->id(),
+            'properties' => json_encode($data['changes'] ?? []),
         ]);
     }
 }

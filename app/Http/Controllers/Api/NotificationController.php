@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\TicketNotification;
-use App\Models\TicketCollaborator;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
@@ -13,8 +12,7 @@ class NotificationController extends Controller
     {
         $user = $request->user();
         
-        $notifications = TicketNotification::forUser($user->id)
-            ->with(['ticket', 'sender'])
+        $notifications = $user->notifications()
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -25,9 +23,7 @@ class NotificationController extends Controller
     {
         $user = $request->user();
         
-        $notifications = TicketNotification::forUser($user->id)
-            ->unread()
-            ->with(['ticket', 'sender'])
+        $notifications = $user->unreadNotifications()
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -37,10 +33,16 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead(Request $request, TicketNotification $notification)
+    public function markAsRead(Request $request, $notificationId)
     {
-        if ($notification->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = $request->user();
+        
+        $notification = $user->notifications()
+            ->where('id', $notificationId)
+            ->first();
+
+        if (!$notification) {
+            return response()->json(['message' => 'Notification not found'], 404);
         }
 
         $notification->markAsRead();
@@ -52,58 +54,124 @@ class NotificationController extends Controller
     {
         $user = $request->user();
         
-        TicketNotification::forUser($user->id)
-            ->unread()
-            ->update(['read_at' => now()]);
+        $user->unreadNotifications->markAsRead();
 
         return response()->json(['message' => 'All notifications marked as read']);
     }
 
-    public function acceptCollaborationRequest(Request $request, TicketNotification $notification)
+    public function acceptCollaboration(Request $request, $notificationId)
     {
-        if ($notification->user_id !== $request->user()->id || 
-            $notification->type !== 'collaboration_request') {
-            return response()->json(['message' => 'Invalid request'], 400);
+        try {
+            $user = $request->user();
+            
+            $notification = $user->notifications()
+                ->where('id', $notificationId)
+                ->where('type', 'App\Notifications\CollaborationRequest')
+                ->first();
+
+            if (!$notification) {
+                return response()->json(['message' => 'Collaboration notification not found'], 404);
+            }
+
+            // Check if already processed
+            if ($notification->read_at) {
+                return response()->json(['message' => 'This collaboration request has already been processed'], 400);
+            }
+
+            // Get ticket from notification data
+            $ticketId = $notification->data['ticket_id'] ?? null;
+            if (!$ticketId) {
+                return response()->json(['message' => 'Invalid notification data'], 400);
+            }
+
+            $ticket = \App\Models\Ticket::find($ticketId);
+            if (!$ticket) {
+                return response()->json(['message' => 'Ticket not found'], 404);
+            }
+
+            // Check if user is already a collaborator
+            $existingCollaborator = $ticket->collaborators()->where('user_id', $user->id)->first();
+            if ($existingCollaborator) {
+                $notification->markAsRead();
+                return response()->json(['message' => 'You are already a collaborator on this ticket'], 400);
+            }
+
+            // Use the existing respondToCollaboration method
+            $request->merge(['action' => 'accept']);
+            
+            $controller = new TicketController(new \App\Services\TicketService());
+            $response = $controller->respondToCollaboration($request, $ticket);
+
+            // Mark notification as read
+            $notification->markAsRead();
+
+            return $response;
+            
+        } catch (\Exception $e) {
+            \Log::error('Collaboration acceptance error: ' . $e->getMessage(), [
+                'notification_id' => $notificationId,
+                'user_id' => $request->user()->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Failed to accept collaboration request. Please try again.'
+            ], 500);
         }
-
-        $collaborator = TicketCollaborator::where('ticket_id', $notification->ticket_id)
-            ->where('user_id', $notification->user_id)
-            ->where('status', 'pending')
-            ->first();
-
-        if (!$collaborator) {
-            return response()->json(['message' => 'Collaboration request not found'], 404);
-        }
-
-        $collaborator->accept();
-        $notification->accept();
-        $notification->markAsRead();
-
-        return response()->json([
-            'message' => 'Collaboration request accepted',
-            'collaborator' => $collaborator->fresh(['ticket', 'user'])
-        ]);
     }
 
-    public function rejectCollaborationRequest(Request $request, TicketNotification $notification)
+    public function rejectCollaboration(Request $request, $notificationId)
     {
-        if ($notification->user_id !== $request->user()->id || 
-            $notification->type !== 'collaboration_request') {
-            return response()->json(['message' => 'Invalid request'], 400);
+        try {
+            $user = $request->user();
+            
+            $notification = $user->notifications()
+                ->where('id', $notificationId)
+                ->where('type', 'App\Notifications\CollaborationRequest')
+                ->first();
+
+            if (!$notification) {
+                return response()->json(['message' => 'Collaboration notification not found'], 404);
+            }
+
+            // Check if already processed
+            if ($notification->read_at) {
+                return response()->json(['message' => 'This collaboration request has already been processed'], 400);
+            }
+
+            // Get ticket from notification data
+            $ticketId = $notification->data['ticket_id'] ?? null;
+            if (!$ticketId) {
+                return response()->json(['message' => 'Invalid notification data'], 400);
+            }
+
+            $ticket = \App\Models\Ticket::find($ticketId);
+            if (!$ticket) {
+                return response()->json(['message' => 'Ticket not found'], 404);
+            }
+
+            // Use the existing respondToCollaboration method
+            $request->merge(['action' => 'decline']);
+            
+            $controller = new TicketController(new \App\Services\TicketService());
+            $response = $controller->respondToCollaboration($request, $ticket);
+
+            // Mark notification as read
+            $notification->markAsRead();
+
+            return $response;
+            
+        } catch (\Exception $e) {
+            \Log::error('Collaboration rejection error: ' . $e->getMessage(), [
+                'notification_id' => $notificationId,
+                'user_id' => $request->user()->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Failed to reject collaboration request. Please try again.'
+            ], 500);
         }
-
-        $collaborator = TicketCollaborator::where('ticket_id', $notification->ticket_id)
-            ->where('user_id', $notification->user_id)
-            ->where('status', 'pending')
-            ->first();
-
-        if ($collaborator) {
-            $collaborator->delete();
-        }
-
-        $notification->reject();
-        $notification->markAsRead();
-
-        return response()->json(['message' => 'Collaboration request rejected']);
     }
+
 }
