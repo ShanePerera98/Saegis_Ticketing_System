@@ -95,8 +95,8 @@ class UserController extends Controller
 
         // Apply role-based access control
         if ($user->role === UserRole::ADMIN) {
-            // Admins can only see other admins, not super admins
-            $query->where('role', UserRole::ADMIN);
+            // Admins can see both other admins and super admins for collaboration
+            $query->whereIn('role', [UserRole::ADMIN, UserRole::SUPER_ADMIN]);
         }
         // Super admins can see all staff (admins and super admins)
 
