@@ -5,8 +5,40 @@ import { notificationApi } from '../services/api';
 
 const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [previousCount, setPreviousCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const dropdownRef = useRef(null);
+  const audioRef = useRef(null);
   const queryClient = useQueryClient();
+
+  // Initialize audio element and load user preferences
+  useEffect(() => {
+    audioRef.current = new Audio('/sounds/notifications/notification.wav');
+    
+    // Load user sound preference (default: enabled)
+    const savedSoundEnabled = localStorage.getItem('notificationSoundEnabled');
+    const isEnabled = savedSoundEnabled === null ? true : savedSoundEnabled === 'true';
+    
+    if (savedSoundEnabled === null) {
+      localStorage.setItem('notificationSoundEnabled', 'true');
+    }
+    
+    setSoundEnabled(isEnabled);
+    
+    // Set volume based on user preference (default: 50%)
+    const volume = localStorage.getItem('notificationVolume') || '0.5';
+    audioRef.current.volume = parseFloat(volume);
+    
+    // Preload the audio file
+    audioRef.current.preload = 'auto';
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
 
   // Fetch unread notifications
   const { data: unreadData = { notifications: [], count: 0 } } = useQuery({
@@ -15,6 +47,25 @@ const NotificationBell = () => {
     select: (data) => data.data || { notifications: [], count: 0 },
     refetchInterval: 30000, // Refetch every 30 seconds
   });
+
+  // Play notification sound when new notifications arrive
+  useEffect(() => {
+    const currentCount = unreadData.count || 0;
+    
+    // Only play sound if there are new notifications (count increased)
+    if (previousCount > 0 && currentCount > previousCount && audioRef.current) {
+      try {
+        audioRef.current.currentTime = 0; // Reset to beginning
+        audioRef.current.play().catch((error) => {
+          console.log('Audio play failed (user interaction required):', error);
+        });
+      } catch (error) {
+        console.log('Audio error:', error);
+      }
+    }
+    
+    setPreviousCount(currentCount);
+  }, [unreadData.count, previousCount]);
 
   // Fetch all notifications when dropdown is open
   const { data: allNotifications = [] } = useQuery({
@@ -105,6 +156,33 @@ const NotificationBell = () => {
     return `${diffInDays}d ago`;
   };
 
+  // Function to play notification sound with user preference check
+  const playNotificationSound = () => {
+    try {
+      const soundEnabled = localStorage.getItem('notificationSoundEnabled') === 'true';
+      if (soundEnabled && audioRef.current) {
+        audioRef.current.currentTime = 0; // Reset to beginning
+        audioRef.current.play().catch((error) => {
+          console.log('Audio play failed:', error);
+        });
+      }
+    } catch (error) {
+      console.log('Audio error:', error);
+    }
+  };
+
+  // Function to toggle sound preference
+  const toggleNotificationSound = () => {
+    const newSetting = !soundEnabled;
+    setSoundEnabled(newSetting);
+    localStorage.setItem('notificationSoundEnabled', newSetting.toString());
+    
+    // Play a test sound if enabling
+    if (newSetting) {
+      playNotificationSound();
+    }
+  };
+
   const handleNotificationClick = async (notification) => {
     if (!notification.read_at) {
       await markAsReadMutation.mutateAsync(notification.id);
@@ -112,17 +190,32 @@ const NotificationBell = () => {
   };
 
   const handleMarkAllAsRead = async () => {
-    await markAllAsReadMutation.mutateAsync();
+    try {
+      await markAllAsReadMutation.mutateAsync();
+      playNotificationSound(); // Play sound when all notifications marked as read
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+    }
   };
 
   const handleAcceptCollaboration = async (notificationId, e) => {
     e.stopPropagation();
-    await acceptCollaborationMutation.mutateAsync(notificationId);
+    try {
+      await acceptCollaborationMutation.mutateAsync(notificationId);
+      playNotificationSound(); // Play sound on successful acceptance
+    } catch (error) {
+      console.error('Failed to accept collaboration:', error);
+    }
   };
 
   const handleRejectCollaboration = async (notificationId, e) => {
     e.stopPropagation();
-    await rejectCollaborationMutation.mutateAsync(notificationId);
+    try {
+      await rejectCollaborationMutation.mutateAsync(notificationId);
+      playNotificationSound(); // Play sound on successful rejection
+    } catch (error) {
+      console.error('Failed to reject collaboration:', error);
+    }
   };
 
   const displayNotifications = isOpen ? allNotifications : unreadData.notifications;
@@ -146,17 +239,34 @@ const NotificationBell = () => {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-            {unreadData.count > 0 && (
+          <div className="px-4 py-3 border-b border-gray-200">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              {unreadData.count > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  disabled={markAllAsReadMutation.isLoading}
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
+            
+            {/* Sound Control */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">Sound notifications:</span>
               <button
-                onClick={handleMarkAllAsRead}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                disabled={markAllAsReadMutation.isLoading}
+                onClick={toggleNotificationSound}
+                className={`text-xs px-2 py-1 rounded transition-colors ${
+                  soundEnabled
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
               >
-                Mark all read
+                {soundEnabled ? '🔊 On' : '🔇 Off'}
               </button>
-            )}
+            </div>
           </div>
 
           {/* Notification List */}
